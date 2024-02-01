@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-int ReadSector(LPCWSTR  drive, int readPoint, BYTE sector[512])
+int ReadSector(LPCSTR  drive, int readPoint, BYTE sector[512])
 {
     int retCode = 0;
     DWORD bytesRead;
@@ -36,6 +36,7 @@ int main(int argc, char ** argv)
 {
     
     BYTE sector[512];
-    ReadSector(L"\\\\.\\C:",0, sector);
+    ReadSector("\\\\.\\C:",0, sector);
+    system("pause");
     return 0;
 }
