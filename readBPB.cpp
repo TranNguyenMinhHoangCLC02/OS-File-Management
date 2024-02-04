@@ -102,6 +102,25 @@ int getSv(vector<string> storedValues)
     return convertHexadecimalToDecimal(temp);
 }
 
+int startingClusterOfMFT(vector<string> storedValues)
+{
+    int beginningOfNTFS = findNTFSIdentifier(storedValues);
+    int current = beginningOfNTFS + 4 + 8;
+    string temp = "";
+    for (int i = 7; i >= 0; i--)
+        temp += storedValues[current + i];
+    return convertHexadecimalToDecimal(temp);
+}
+
+int getSizeOfAMFTEntry(vector<string> storedValues)
+{
+    int beginningOfNTFS = findNTFSIdentifier(storedValues);
+    int current = beginningOfNTFS + 4 + 8 + 8 + 8;
+    string temp = "";
+    temp += storedValues[current];
+    return convertHexadecimalToDecimal(temp);
+}
+
 int main() {
     const char* diskPath = "\\\\.\\C:"; 
     string hexRepresentation;
@@ -130,6 +149,8 @@ int main() {
     cout << "h = " << getHeadNumber(storedValues) << endl;
     cout << "Beginning sector of logical partition = " << getBeginningSectorOfLogicalPartition(storedValues) << endl;
     cout << "Sv = " << getSv(storedValues) << endl;
+    cout << "Starting cluster of MFT = " << startingClusterOfMFT(storedValues) << endl;
+    cout << "Size of a MFT entry = " << getSizeOfAMFTEntry(storedValues) << endl;
     system("pause");
     return 0;
 }
