@@ -5,12 +5,20 @@
 
 using namespace std;
 
+string convertToUpperCase(string input)
+{
+    for (int i = 0; i < input.size(); i++)
+        if (input[i] >= 'a' && input[i] <= 'z')
+            input[i] = input[i] - 'a' + 'A';
+    return input;
+}
+
 string getHexRepresentation(const char* data, size_t size) 
 {
     stringstream hexString;
     for (size_t i = 0; i < size; ++i)
         hexString << hex << setw(2) << setfill('0') << static_cast<int>(static_cast<unsigned char>(data[i])) << " ";
-    return hexString.str();
+    return convertToUpperCase(hexString.str());
 }
 
 void getArrayFromHex(const string& hexString, vector<string>& storedValues) 
@@ -151,6 +159,12 @@ int main() {
     cout << "Sv = " << getSv(storedValues) << endl;
     cout << "Starting cluster of MFT = " << startingClusterOfMFT(storedValues) << endl;
     cout << "Size of a MFT entry = " << getSizeOfAMFTEntry(storedValues) << endl;
+    for (int i = 0; i < storedValues.size(); i++)
+    {
+        cout << storedValues[i] << " ";
+        if ((i + 1) % 16 == 0)
+            cout << endl;
+    }
     system("pause");
     return 0;
 }
