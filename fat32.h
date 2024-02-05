@@ -21,4 +21,6 @@ public:
     bool readCluster(DWORD clusterNumber);
     bool readDirectory(DWORD clusterNumber);
     bool readFile(DWORD clusterNumber, string fileName);
+
+    BYTE* getSector();
 };

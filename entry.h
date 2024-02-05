@@ -25,4 +25,5 @@ private:
     EntryAttribute _attribute;
 public:
     Entry(FAT32 fat32, DWORD clusterNumber, DWORD offset);
+    void printEntry();
 };
