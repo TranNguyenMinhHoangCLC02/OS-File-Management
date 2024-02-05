@@ -1,33 +1,4 @@
-#include <iostream>
-#include <windows.h>
-#include <iomanip>
-#include <vector>
-
-using namespace std;
-
-string convertToUpperCase(string input)
-{
-    for (int i = 0; i < input.size(); i++)
-        if (input[i] >= 'a' && input[i] <= 'z')
-            input[i] = input[i] - 'a' + 'A';
-    return input;
-}
-
-string getHexRepresentation(const char* data, size_t size) 
-{
-    stringstream hexString;
-    for (size_t i = 0; i < size; ++i)
-        hexString << hex << setw(2) << setfill('0') << static_cast<int>(static_cast<unsigned char>(data[i])) << " ";
-    return convertToUpperCase(hexString.str());
-}
-
-void getArrayFromHex(const string& hexString, vector<string>& storedValues) 
-{
-    stringstream hexStream(hexString);
-    string temp;
-    while (getline(hexStream, temp, ' ')) 
-        storedValues.push_back(temp);
-}
+#include "read.h"
 
 int findNTFSIdentifier(vector<string> storedValues)
 {
@@ -129,28 +100,13 @@ int getSizeOfAMFTEntry(vector<string> storedValues)
     return convertHexadecimalToDecimal(temp);
 }
 
-int main() {
-    const char* diskPath = "\\\\.\\C:"; 
-    string hexRepresentation;
-    HANDLE hDevice = CreateFileA(diskPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, NULL);
+void readBPB(const char *diskPath, vector<string> &storedValues)
+{
+    readSector(diskPath, 0, 512, storedValues);
+}
 
-    if (hDevice == INVALID_HANDLE_VALUE) {
-        std::cerr << "Failed to open disk. Error code: " << GetLastError() << endl;
-        return 1;
-    }
-
-    const DWORD vbrSize = 512;  // Tui đoán thế thôi chớ không biết kích thước cụ thể, chủ yếu để tìm cái BPB thôi
-    char vbr[vbrSize];
-    vector<string> storedValues;
-    DWORD bytesRead;
-    if (ReadFile(hDevice, vbr, vbrSize, &bytesRead, NULL)) 
-        hexRepresentation = getHexRepresentation(vbr, bytesRead);
-    else 
-        cerr << "Failed to read VBR. Error code: " << GetLastError() << endl;
-
-    CloseHandle(hDevice);
-    getArrayFromHex(hexRepresentation, storedValues);
+void printBPBInfo(vector<string> storedValues)
+{
     cout << "Sector size = " << getSectorSize(storedValues) << endl;
     cout << "Sc = " << getSc(storedValues) << endl;
     cout << "st = " << getst(storedValues) << endl;
@@ -159,12 +115,24 @@ int main() {
     cout << "Sv = " << getSv(storedValues) << endl;
     cout << "Starting cluster of MFT = " << startingClusterOfMFT(storedValues) << endl;
     cout << "Size of a MFT entry = " << getSizeOfAMFTEntry(storedValues) << endl;
+}
+
+void printBPB(vector<string> storedValues)
+{
     for (int i = 0; i < storedValues.size(); i++)
     {
         cout << storedValues[i] << " ";
         if ((i + 1) % 16 == 0)
             cout << endl;
     }
-    system("pause");
-    return 0;
 }
+
+// int main()
+// {
+//     const char *diskPath = "\\\\.\\C:";
+//     vector<string> storedValues;
+//     readBPB(diskPath, storedValues);
+//     printBPBInfo(storedValues);
+//     system("pause");
+//     return 0;
+// }
