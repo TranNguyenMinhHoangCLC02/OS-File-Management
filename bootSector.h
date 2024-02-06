@@ -1,5 +1,4 @@
 #pragma once
-#include "fat32.h"
 #include <windows.h>
 #include <stdio.h>
 #include <iostream>

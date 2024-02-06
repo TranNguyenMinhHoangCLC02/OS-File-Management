@@ -1,59 +1,147 @@
 #include "entry.h"
 
-Entry::Entry(FAT32 fat32, DWORD clusterNumber, DWORD offset) {
-    fat32.readCluster(clusterNumber);
-    BYTE* sector = fat32.getSector();
-    BYTE* entry = sector + offset;
+bool checkPrimary(vector<string> entry)
+{
+    if (entry[11] == "0F")
+        return false;
+    return true;
+}
 
-    _status = entry[0]; // get status of entry
-    if (_status == 0x00)
-    {
-        _name = "";
+bool checkEmpty(vector<string> entry)
+{
+    for (int i = 0; i < entry.size(); i++)
+        if (entry[i] != "00")
+            return false;
+    return true;
+}
+
+string getNameFromSecondaryEntry(vector<string> entry)
+{
+    string name = "";
+    for (int i = 1; i <= 10; i++)
+        name += entry[i];
+    for (int i = 14; i <= 14 + 12; i++)
+        name += entry[i];
+    for (int i = 28; i <= 28 + 4; i++)
+        name += entry[i];
+    return convertHexToUTF16(name);
+}
+
+string getFullNameFromASetOfEntry(vector<vector<string>> entry)
+{
+    if (entry.size() == 1)
+        return ""; //idk man :v
+    string name = "";
+    for (int i = entry.size() - 1; i >= 0; i--)
+        name += getNameFromSecondaryEntry(entry[i]);
+    return name;
+}
+
+Entry::Entry() {
+    name = "";
+    status = 0;
+    size = 0;
+    firstCluster = 0;
+    attribute = (EntryAttribute)0;
+}
+
+void Entry::readEntry(vector<vector<string>> entry)
+{
+    this->entry = entry;
+    vector<string> primary = this->entry[this->entry.size() - 1];
+    this->status = convertHexadecimalToDecimal(primary[0]);
+    if (this->status == 0 || this->status == 0xE5)
         return;
-    }
-    if (_status == 0xE5)
+    if (this->entry.size() > 1)
+        this->name = getFullNameFromASetOfEntry(this->entry);
+    else
     {
-        _name = "DELETED";
-        return;
-    }
-
-    _attribute = (EntryAttribute)entry[11]; // get attribute of entry
-    _size = *(DWORD*)(entry + 28); // get size of entry
-    _creationTime = *(DWORD*)(entry + 14); // get creation time of entry
-    _lastModifiedTime = *(DWORD*)(entry + 22); // get last modified time of entry
-
-    // get first cluster form offset 20 and 26
-    _firstCluster = *(WORD*)(entry + 20) + (*(WORD*)(entry + 26) << 16);
-
-    _name = ""; // get name of entry
-    for (int i = 0; i < 8; i++)
-    {
-        if (entry[i] == ' ')
-            break;
-        _name += entry[i];
-    }
-    if (_attribute & Directory) // if entry is a directory
-    {
-        _name += ".";
+        for (int i = 0; i < 8; i++)
+        this->name += primary[i];
+        this->name = convertHexToUTF16(this->name);
+        this->name += '.';
+        string extension = "";
         for (int i = 8; i < 11; i++)
-        {
-            if (entry[i] == ' ')
-                break;
-            _name += entry[i];
-        }
+            extension += primary[i];
+        extension = convertHexToUTF16(extension);
+        this->name += extension;
     }
+    this->attribute = (EntryAttribute)convertHexadecimalToDecimal(primary[11]);
+    string temp = "";
+    for (int i = 28 + 3; i >= 28; i--)
+        temp += primary[i];
+    this->size = convertHexadecimalToDecimal(temp);
+    temp = "";
+    for (int i = 14 + 1; i >= 14; i--)
+        temp += primary[i];
+    for (int i = 26 + 1; i >= 26; i--)
+        temp += primary[i];
+    this->firstCluster = convertHexadecimalToDecimal(temp);
 }
 
 void Entry::printEntry()
 {
-    if (_name == "")
+    if (name == "")
         return;
-    cout << "Name: " << _name << endl;
-    cout << "Status: " << (int)_status << endl;
-    cout << "Attribute: " << (int)_attribute << endl;
-    cout << "Size: " << _size << " bytes" << endl;
-    cout << "First cluster: " << _firstCluster << endl;
-    cout << "Creation time: " << ctime(&_creationTime);
-    cout << "Last modified time: " << ctime(&_lastModifiedTime);
+    cout << "Name: " << name << endl;
+    cout << "Status: " << (int)status << endl;
+    cout << "Attribute: " << (int)attribute << endl;
+    cout << "Size: " << size << " bytes" << endl;
+    cout << "First cluster: " << firstCluster << endl;
     cout << endl;
+}
+
+void Entries::readEntireEntries(DWORD startingSectorOfRDET)
+{
+    vector<string> storedValues;
+    while (true)
+    {
+        bool findEmpty = false;
+        readSector("\\\\.\\D:", startingSectorOfRDET * 512, 512, storedValues);
+        vector<string> entry;
+        for (int i = 0; i < storedValues.size(); i += 32)
+        {
+            for (int j = 0; j < 32; j++)
+                entry.push_back(storedValues[i + j]);
+            if (checkEmpty(entry))
+            {
+                findEmpty = true;
+                break;
+            }
+            this->entireEntries.push_back(entry);
+        }
+        if (findEmpty == true)
+            break;
+    }
+}
+
+vector<vector<string>> extractEntry(vector<vector<string>> &entries)
+{
+    vector<vector<string>> result;
+    for (int i = 0; i < entries.size(); i++)
+    {
+        result.push_back(entries[i]);
+        entries.erase(entries.begin() + i);
+        if (checkPrimary(entries[i]) == true)
+            break;
+    }
+    return result;
+}
+
+void Entries::readEntries()
+{
+    vector<vector<string>> temp = this->entireEntries;
+    while (temp.size() > 0)
+    {
+        vector<vector<string>> entry = extractEntry(temp);
+        Entry *newEntry = new Entry();
+        newEntry->readEntry(entry);
+        this->entries.push_back(newEntry);
+    }
+}
+
+Entries::~Entries()
+{
+    for (int i = 0; i < this->entries.size(); i++)
+        delete this->entries[i];
 }

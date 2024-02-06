@@ -1,8 +1,11 @@
 #pragma once
-#include "fat32.h"
 #include <time.h>
 #include <vector>
 #include <cstdint>
+#include <windows.h>
+#include <string>
+#include <iostream>
+#include "read.h"
 
 using namespace std;
 
@@ -17,20 +20,32 @@ enum EntryAttribute {
 
 class Entry {
 private:
-    string _name;
-    BYTE _status; // 0x00: entry empty, 0xE5: file is deleted, else: entry is in use
-    time_t _creationTime;
-    time_t _lastModifiedTime;
-    uint64_t _size;
-    uint16_t _firstCluster;
-    EntryAttribute _attribute;
+    string name;
+    BYTE status; // 0x00: entry empty, 0xE5: file is deleted, else: entry is in use
+    uint64_t size;
+    uint16_t firstCluster;
+    EntryAttribute attribute;
+    vector<vector<string>> entry;
 public:
-    Entry(FAT32 fat32, DWORD clusterNumber, DWORD offset);
+    Entry();
+    void readEntry(vector<vector<string>> entry);
     void printEntry();
-    string getName(){
-        return _name;
-    };
-    BYTE getStatus(){
-        return _status;
-    };
+    string getName(){ return name; };
+    BYTE getStatus(){ return status; };
+    friend string getFullNameFromASetOfEntry(vector<vector<string>> entry);
+    friend string getNameFromSecondaryEntry(vector<string> entry);
+    friend bool checkEmpty(vector<string> entry);
+    friend bool checkPrimary(vector<string> entry);
+};
+
+class Entries
+{
+private:
+    vector<Entry *> entries;
+    vector<vector<string>> entireEntries;
+public:
+    ~Entries();
+    void readEntireEntries(DWORD startingSectorOfRDET);
+    friend vector<vector<string>> extractEntry(vector<vector<string>> &entries);
+    void readEntries();
 };

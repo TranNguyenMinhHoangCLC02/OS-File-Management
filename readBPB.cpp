@@ -12,19 +12,6 @@ int findBeginningOfBPB(vector<string> storedValues)
     return findNTFSIdentifier(storedValues) - 25;
 }
 
-int convertHexadecimalToDecimal(string input)
-{
-    int result = 0;
-    for (int i = 0; i < input.size(); i++)
-    {
-        if (input[i] >= '0' && input[i] <= '9')
-            result = result * 16 + (input[i] - '0');
-        else
-            result = result * 16 + (input[i] - 'A' + 10);
-    }
-    return result;
-}
-
 int getSectorSize(vector<string> storedValues)
 {
     int beginningOfBPB = findBeginningOfBPB(storedValues);
