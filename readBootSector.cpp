@@ -31,7 +31,8 @@ void BootSector::readBootSector(BYTE sector[512])
             (static_cast<uint64_t>(sector[87]) << 40) |
             (static_cast<uint64_t>(sector[88]) << 48) |
             (static_cast<uint64_t>(sector[89]) << 56);
-    }
+}
+
 void BootSector::printBootSector() {
     cout << "Sectors per cluster: " << (int)Sc << endl;
     cout << "Sector of boot sector: " << Sb << endl;

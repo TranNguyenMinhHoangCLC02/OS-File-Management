@@ -21,4 +21,8 @@ public:
     BootSector();
     void readBootSector(BYTE sector[512]);
     void printBootSector();
+    BYTE getstartClusterRDET() { return startClusterRDET; }
+    DWORD getSf() { return Sf; }
+    DWORD getNf() { return Nf; }
+    WORD getSb() { return Sb; }
 };
