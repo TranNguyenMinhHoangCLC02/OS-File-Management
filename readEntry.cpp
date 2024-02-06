@@ -87,8 +87,8 @@ string getFullNameFromASetOfEntry(vector<vector<string>> entry)
 }
 
 
-int main(int argc, char ** argv)
-{
+// int main(int argc, char ** argv)
+// {
     // BYTE sector[512];
     // readSector("\\\\.\\D:", 0, sector);
     // BootSector bootSector;
@@ -99,4 +99,4 @@ int main(int argc, char ** argv)
     // readEntries(storedValues, startingSectorOfRDET, entries);
     // system("pause");
     // return 0;
-}
+// }

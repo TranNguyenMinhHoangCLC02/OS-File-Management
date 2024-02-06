@@ -2,6 +2,7 @@
 #include "fat32.h"
 #include <time.h>
 #include <vector>
+#include <cstdint>
 
 using namespace std;
 
@@ -26,4 +27,10 @@ private:
 public:
     Entry(FAT32 fat32, DWORD clusterNumber, DWORD offset);
     void printEntry();
+    string getName(){
+        return _name;
+    };
+    BYTE getStatus(){
+        return _status;
+    };
 };
