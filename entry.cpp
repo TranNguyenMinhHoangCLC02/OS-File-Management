@@ -94,10 +94,11 @@ void Entry::printEntry()
 void Entries::readEntireEntries(DWORD startingSectorOfRDET)
 {
     vector<string> storedValues;
+    DWORD currentSector = startingSectorOfRDET;
     while (true)
     {
         bool findEmpty = false;
-        readSector("\\\\.\\D:", startingSectorOfRDET * 512, 512, storedValues);
+        readSector("\\\\.\\D:", currentSector * 512, 512, storedValues);
         vector<string> entry;
         for (int i = 0; i < storedValues.size(); i += 32)
         {
@@ -112,6 +113,7 @@ void Entries::readEntireEntries(DWORD startingSectorOfRDET)
         }
         if (findEmpty == true)
             break;
+        currentSector += 1;
     }
 }
 
