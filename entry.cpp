@@ -98,7 +98,7 @@ void Entries::readEntireEntries(DWORD startingSectorOfRDET)
     while (true)
     {
         bool findEmpty = false;
-        readSector("\\\\.\\D:", currentSector * 512, 512, storedValues);
+        readSector("\\\\.\\E:", currentSector * 512, 512, storedValues);
         vector<string> entry;
         for (int i = 0; i < storedValues.size(); i += 32)
         {
@@ -146,4 +146,10 @@ Entries::~Entries()
 {
     for (int i = 0; i < this->entries.size(); i++)
         delete this->entries[i];
+}
+
+void Entries::printAllEntries()
+{
+    for (int i = 0; i < entries.size(); i++)
+        entries[i]->printEntry();
 }
