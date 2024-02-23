@@ -48,4 +48,11 @@ public:
     void readEntireEntries(DWORD startingSectorOfRDET);
     friend vector<vector<string>> extractEntry(vector<vector<string>> &entries);
     void readEntries();
+    void printAllEntries();
 };
+
+void Entries::printAllEntries()
+{
+    for (int i = 0; i < entries.size(); i++)
+        entries[i]->printEntry();
+}
