@@ -3,49 +3,10 @@
 #include <vector>
 #include <string>
 #include "bootSector.h"
-#include "entry.h"
 #include "time.h"
+#include "entry.h"
 
 using namespace std;
-
-bool checkDifferent(vector<string> original, vector<string> storedValues)
-{
-    for (int i = 0; i < original.size(); i++)
-        if (original[i] != storedValues[i])
-            return true;
-    return false;
-}
-
-bool checkFirstEntry(vector<string> storedValues)
-{
-    for (int i = 0; i < 8; i++)
-        if (storedValues[i] == "00")
-            return false;
-    return true;
-}
-
-bool findStringINVector(vector<string> storedValues)
-{
-    string target = "74 20 65 20 73 20 74 20";
-    vector<string> temp;
-    getArrayFromHex(target, temp);
-    for (int i = 0; i < storedValues.size(); i++)
-    {
-        if (storedValues[i] == temp[0])
-        {
-            bool found = true;
-            for (int j = 1; j < temp.size(); j++)
-                if (storedValues[i + j] != temp[j])
-                {
-                    found = false;
-                    break;
-                }
-            if (found)
-                return true;
-        }
-    }
-    return false; // Added return statement to handle all code paths
-}
 
 int main()
 {
@@ -53,15 +14,29 @@ int main()
     readSector("\\\\.\\E:", 0, sector);
     BootSector bootSector;
     bootSector.readBootSector(sector);
-    DWORD startCluster = bootSector.getSb() + bootSector.getSf() * bootSector.getNf() + bootSector.getstartClusterRDET() * bootSector.getSc() - 2;
-    vector<string> storedValues;
-    startCluster = bootSector.getSb();
-    readSector("\\\\.\\E:", startCluster, 512, storedValues);
-    for (int i = 0; i < storedValues.size(); i++)
-    {
-        if (i % 16 == 0)
-            cout << endl;
-        cout << storedValues[i] << " ";
-    }
+    bootSector.printBootSector();
+    vector<vector<string>> entries;
+    DWORD startSectorOfRDET = bootSector.getSb() + bootSector.getSf() * bootSector.getNf();
+    readEntireEntries(startSectorOfRDET, entries);
+    removeFaultyEntry(entries);
+    // vector<Entry *> entry;
+    // while (entries.empty() == false)
+    // {
+    //     vector<vector<string>> temp = extractEntry(entries);
+    //     Entry *newEntry = new Entry();
+    //     newEntry->readEntry(temp);
+    //     entry.push_back(newEntry);
+    // }
+    // for (int i = 0; i < entry.size(); i++)
+    // {
+    //     entry[i]->print();
+    //     entry[i]->printEntry();
+    //     cout << endl;
+    // }
+    // for (int i = 0; i < entry.size(); i++)
+    //     delete entry[i];
+    Entries entry;
+    entry.input(entries);
+    entry.print();
     return 0;
 }

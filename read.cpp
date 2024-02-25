@@ -2,27 +2,21 @@
 
 string convertHexToUTF16(string input)
 {
-    string result = "";
-    for (int i = 0; i < input.size(); i += 2)
+    string result;
+    for (int i = 0; i < input.length(); i += 2)
     {
-        string temp = input.substr(i, 2);
-        int value = stoi(temp, 0, 16);
-        result += (char)value;
+        string byteString = input.substr(i, 2);
+        char byte = static_cast<char>(convertHexadecimalToDecimal(byteString));
+        result += byte;
     }
     return result;
 }
 
 int convertHexadecimalToDecimal(string input)
 {
-    int result = 0;
-    for (int i = 0; i < input.size(); i++)
-    {
-        if (input[i] >= '0' && input[i] <= '9')
-            result = result * 16 + (input[i] - '0');
-        else
-            result = result * 16 + (input[i] - 'A' + 10);
-    }
-    return result;
+    int num;
+    stringstream(input) >> hex >> num;
+    return num;
 }
 
 string convertToUpperCase(string input)
@@ -62,10 +56,15 @@ void readSector(const char *diskPath, DWORD offset, DWORD size, vector<string> &
     string hexRepresentation;
     SetFilePointer(hDevice, offset, NULL, FILE_BEGIN);
     if (ReadFile(hDevice, buffer, size, &bytesRead, NULL)) 
+    {
         hexRepresentation = getHexRepresentation(buffer, bytesRead);
+        getArrayFromHex(hexRepresentation, storedValues);
+    }
     else 
+    {
         cerr << "Failed to read VBR. Error code: " << GetLastError() << endl;
-    getArrayFromHex(hexRepresentation, storedValues);
+        storedValues.clear();
+    }
     CloseHandle(hDevice);
 }
 
