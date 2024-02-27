@@ -97,13 +97,16 @@ void Entries::readEntireEntries(DWORD startingSectorOfRDET)
     DWORD currentSector = startingSectorOfRDET;
     while (true)
     {
+        cout << currentSector << endl;
         bool findEmpty = false;
-        readSector("\\\\.\\D:", currentSector * 512, 512, storedValues);
+        readSector("\\\\.\\F:", currentSector * 512, 512, storedValues);
         vector<string> entry;
         for (int i = 0; i < storedValues.size(); i += 32)
         {
-            for (int j = 0; j < 32; j++)
+            for (int j = 0; j < 32; j++){
                 entry.push_back(storedValues[i + j]);
+                cout << storedValues[i+j] << " ";
+            }
             if (checkEmpty(entry))
             {
                 findEmpty = true;
@@ -138,6 +141,7 @@ void Entries::readEntries()
         vector<vector<string>> entry = extractEntry(temp);
         Entry *newEntry = new Entry();
         newEntry->readEntry(entry);
+        newEntry->printEntry();
         this->entries.push_back(newEntry);
     }
 }

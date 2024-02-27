@@ -23,7 +23,7 @@ private:
     string name;
     BYTE status; // 0x00: entry empty, 0xE5: file is deleted, else: entry is in use
     uint64_t size;
-    uint16_t firstCluster;
+    DWORD firstCluster;
     EntryAttribute attribute;
     vector<vector<string>> entry;
 public:

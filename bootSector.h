@@ -25,4 +25,5 @@ public:
     DWORD getSf() { return Sf; }
     DWORD getNf() { return Nf; }
     WORD getSb() { return Sb; }
+    BYTE getSc() {return Sc;}
 };
