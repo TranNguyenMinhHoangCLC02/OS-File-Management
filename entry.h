@@ -18,34 +18,40 @@ enum EntryAttribute {
     Archive = 0x20     // Bit 5: Archive
 };
 
-class Entry {
+bool checkEmpty(vector<string> entry);
+bool checkPrimary(vector<string> entry);
+void readEntireEntries(DWORD startSectorOfRDET, vector<vector<string>> &entries);
+vector<vector<string>> extractEntry(vector<vector<string>> &entries);
+void removeFaultyEntry(vector<vector<string>> &entries);
+string convertStringToLittleEdian(string input);
+string getStringFromVector(vector<string> storedValues, int start, int length);
+
+class Entry
+{
 private:
     string name;
-    BYTE status; // 0x00: entry empty, 0xE5: file is deleted, else: entry is in use
-    uint64_t size;
-    DWORD firstCluster;
+    BYTE status;
+    int size;
+    int firstCluster;
     EntryAttribute attribute;
-    vector<vector<string>> entry;
+    vector<vector<string>> entries;
 public:
     Entry();
     void readEntry(vector<vector<string>> entry);
     void printEntry();
-    string getName(){ return name; };
-    BYTE getStatus(){ return status; };
+    void print();
+    string getName() { return name; };
+    BYTE getStatus() { return status; };
     friend string getFullNameFromASetOfEntry(vector<vector<string>> entry);
     friend string getNameFromSecondaryEntry(vector<string> entry);
-    friend bool checkEmpty(vector<string> entry);
-    friend bool checkPrimary(vector<string> entry);
 };
 
 class Entries
 {
 private:
-    vector<Entry *> entries;
-    vector<vector<string>> entireEntries;
+    vector<Entry*> entries;
 public:
+    void input(vector<vector<string>> entries);
+    void print();
     ~Entries();
-    void readEntireEntries(DWORD startingSectorOfRDET);
-    friend vector<vector<string>> extractEntry(vector<vector<string>> &entries);
-    void readEntries();
 };
