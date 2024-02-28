@@ -56,6 +56,7 @@ int BPB::getBeginningSectorOfLogicalPartition()
     string temp = "";
     for (int i = 3; i >= 0; i--)
         temp += storedValues[current + i];
+    cout << temp << endl;
     return convertHexadecimalToDecimal(temp);
 }
 
@@ -85,7 +86,8 @@ int BPB::getSizeOfAMFTEntry()
     int current = beginningOfNTFS + 4 + 8 + 8 + 8;
     string temp = "";
     temp += storedValues[current];
-    return convertHexadecimalToDecimal(temp);
+    temp = convertNumToBinary(convertHexadecimalToDecimal(temp));
+    return pow(2, abs(decFromSigned2Complement(temp)));
 }
 
 void readBPB(const char *diskPath, vector<string> &storedValues)

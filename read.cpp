@@ -1,4 +1,5 @@
 #include "read.h"
+#include "math.h"
 
 string convertHexToUTF16(string input)
 {
@@ -17,6 +18,28 @@ int convertHexadecimalToDecimal(string input)
     int num;
     stringstream(input) >> hex >> num;
     return num;
+}
+
+string convertNumToBinary(int num)
+{
+    string result;
+    while (num > 0)
+    {
+        result = to_string(num % 2) + result;
+        num /= 2;
+    }
+    return result;
+}
+
+int decFromSigned2Complement(string input)
+{
+    int result = 0;
+    if (input[0] == '1')
+        result += -1 * pow(2, input.size() - 1);
+    for (int i = 1; i < input.size(); i++)
+        if (input[i] == '1')
+            result += pow(2, input.size() - 1 - i);
+    return result;
 }
 
 string convertToUpperCase(string input)
