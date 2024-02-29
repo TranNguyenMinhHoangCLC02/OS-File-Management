@@ -13,12 +13,12 @@ using namespace std;
 int main()
 {
     // BYTE sector[512];
-    // readSector("\\\\.\\E:", 0, sector);
+    // readSector(L"\\\\.\\E:", 0, sector);
     // BootSector bootSector;
     // bootSector.readBootSector(sector);
     // bootSector.printBootSector();
     // vector<vector<string>> entries;
-    // DWORD startSectorOfRDET = bootSector.getSb() + bootSector.getSf() * bootSector.getNf();
+    // DWORD startSectorOfRDET = bootSector.getStartingClusterOfRDET() * bootSector.getSectorPerCluster();
     // readEntireEntries(startSectorOfRDET, entries);
     // removeFaultyEntry(entries);
     // vector<Entry *> entry;
@@ -40,10 +40,10 @@ int main()
     // Entries entry;
     // entry.input(entries);
     // entry.print();
-    BPB bpb("\\\\.\\F:");
-    LPCWSTR disk = L"\\\\.\\F:";
-    // bpb.printBPBInfo();
-    // bpb.printBPB();
+    LPCWSTR disk = L"\\\\.\\C:";
+    BPB bpb(disk);
+    bpb.printBPBInfo();
+    bpb.printBPB();
     int MFTStart = bpb.startingClusterOfMFT();
     int Sc = bpb.getSc();
     vector<vector<string>> entries;

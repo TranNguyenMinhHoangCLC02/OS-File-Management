@@ -66,10 +66,10 @@ void getArrayFromHex(const string& hexString, vector<string>& storedValues)
         storedValues.push_back(temp);
 }
 
-void readSector(const char *diskPath, DWORD offset, DWORD size, vector<string> &storedValues)
+void readSector(LPCWSTR diskPath, unsigned long long offsetSector, DWORD size, vector<string> &storedValues)
 {
     char buffer[size];
-    HANDLE hDevice = CreateFileA(diskPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+    HANDLE hDevice = CreateFileW(diskPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, NULL);
     if (hDevice == INVALID_HANDLE_VALUE) {
         std::cerr << "Failed to open disk. Error code: " << GetLastError() << endl;
@@ -77,7 +77,9 @@ void readSector(const char *diskPath, DWORD offset, DWORD size, vector<string> &
     }
     DWORD bytesRead;
     string hexRepresentation;
-    SetFilePointer(hDevice, offset, NULL, FILE_BEGIN);
+    LARGE_INTEGER offset;
+    offset.QuadPart = offsetSector * 512;
+    SetFilePointerEx(hDevice, offset, NULL, FILE_BEGIN); // Use SetFilePointerEx for LARGE_INTEGER offset
     if (ReadFile(hDevice, buffer, size, &bytesRead, NULL)) 
     {
         hexRepresentation = getHexRepresentation(buffer, bytesRead);
