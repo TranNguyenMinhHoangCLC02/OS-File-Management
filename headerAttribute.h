@@ -13,6 +13,16 @@ private:
     int flag;
     int AttributeID;
 public:
+    NTFSAttributeHeader()
+    {
+        this->typeID = 0;
+        this->attributeSize = 0;
+        this->flagNonResident = 0;
+        this->lengthAttribute = 0;
+        this->positionOfAttribute = 0;
+        this->flag = 0;
+        this->AttributeID = 0;
+    }
     NTFSAttributeHeader(vector<string> header);
     void print();
     void printInfo();
