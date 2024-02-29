@@ -6,6 +6,7 @@
 #include "time.h"
 #include "entry.h"
 #include "BPB.h"
+#include "MFT.h"
 
 using namespace std;
 
@@ -40,8 +41,14 @@ int main()
     // entry.input(entries);
     // entry.print();
     BPB bpb("\\\\.\\C:");
+    LPCWSTR disk = L"\\\\.\\C:";
     bpb.printBPBInfo();
     bpb.printBPB();
+    int MFTStart = bpb.startingClusterOfMFT();
+    int Sc = bpb.getSc();
+    vector<vector<string>> entries;
+    read_MFT(MFTStart, Sc, disk, entries);
+    printMFT(entries);
     system("pause");
     return 0;
 }
