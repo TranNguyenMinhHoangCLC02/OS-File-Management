@@ -2,7 +2,6 @@
 #include <windows.h>
 #include <iomanip>
 #include "entry.h"
-
 using namespace std;
 
 void ReadSect2(LPCWSTR disk, BYTE*& DATA, unsigned int _nsect);

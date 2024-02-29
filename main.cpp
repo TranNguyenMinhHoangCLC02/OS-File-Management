@@ -40,15 +40,16 @@ int main()
     // Entries entry;
     // entry.input(entries);
     // entry.print();
-    BPB bpb("\\\\.\\C:");
-    LPCWSTR disk = L"\\\\.\\C:";
-    bpb.printBPBInfo();
-    bpb.printBPB();
+    BPB bpb("\\\\.\\F:");
+    LPCWSTR disk = L"\\\\.\\F:";
+    // bpb.printBPBInfo();
+    // bpb.printBPB();
     int MFTStart = bpb.startingClusterOfMFT();
     int Sc = bpb.getSc();
     vector<vector<string>> entries;
     read_MFT(MFTStart, Sc, disk, entries);
-    printMFT(entries);
+    vector<string> MFT;
     system("pause");
     return 0;
+
 }
