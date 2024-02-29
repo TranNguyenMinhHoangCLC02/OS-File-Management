@@ -1,0 +1,35 @@
+# Compiled object files
+*.o
+*.obj
+
+# Compiled dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Executables
+*.exe
+
+# Build directory
+build/
+
+# Dependency directories
+dependencies/
+
+# IDE specific files
+.vscode/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.user
+*.userprefs
+*.suo
+*.sdf
+*.opensdf
+*.cproj
+*.pidb
+*.ipch/
+*.aps
+*.swp
+.vscode/launch.json
+.vscode/settings.json
