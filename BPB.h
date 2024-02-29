@@ -6,7 +6,7 @@ class BPB
 private:
     vector<string> storedValues;
 public:
-    BPB(const char *diskPath) {readSector(diskPath, 0, 512, storedValues);}
+    BPB(LPCWSTR diskPath) {readSector(diskPath, 0, 512, storedValues);}
     int findNTFSIdentifier();
     int findBeginningOfBPB();
     int getSectorSize();

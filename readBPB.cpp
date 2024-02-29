@@ -90,7 +90,7 @@ int BPB::getSizeOfAMFTEntry()
     return pow(2, abs(decFromSigned2Complement(temp)));
 }
 
-void readBPB(const char *diskPath, vector<string> &storedValues)
+void readBPB(LPCWSTR diskPath, vector<string> &storedValues)
 {
     readSector(diskPath, 0, 512, storedValues);
 }
