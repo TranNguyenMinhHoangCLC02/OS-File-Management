@@ -15,3 +15,7 @@ bool checkMFTEntry(BYTE* MFT);
 void printMFT(vector<vector<string>> entries);
 
 string byteArrayToHexString(const BYTE* data, size_t size);
+
+void read_MFT2(unsigned int MFTStart, unsigned int sectors_per_cluster, vector<vector<string>> &entries);
+
+bool checkMFTEntry(vector<string> entry);

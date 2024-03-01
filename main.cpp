@@ -47,9 +47,10 @@ int main()
     int MFTStart = bpb.startingClusterOfMFT();
     int Sc = bpb.getSc();
     vector<vector<string>> entries;
-    read_MFT(MFTStart, Sc, disk, entries);
-    // $DATA data("\\\\.\\E:", entries[0], bpb, 0);
-    // data.print();
+    // read_MFT(MFTStart, Sc, disk, entries);
+    // vector<string> MFT;
+    read_MFT2(MFTStart, Sc, entries);
+    printMFT(entries);
     system("pause");
     return 0;
 }
