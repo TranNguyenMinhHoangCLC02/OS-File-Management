@@ -39,8 +39,8 @@ private:
     vector<dataRun> runlist; // list of data runs in case of non-resident flag
 public:
     $ATTRIBUTE_LIST(vector<string> entry, DWORD offset, const char *diskPath, BPB bpb);
-    void print();
-    void printInfo();
+    void print(); // print the original data
+    void printInfo(); // print the converted data
     NTFSAttributeHeader getHeader();
     vector<attributeRecord> getRecords();
 };

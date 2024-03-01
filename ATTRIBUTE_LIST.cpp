@@ -94,6 +94,42 @@ $ATTRIBUTE_LIST::$ATTRIBUTE_LIST(vector<string> entry, DWORD offset, const char 
     }
 }
 
+void $ATTRIBUTE_LIST::print()
+{
+    for (int i = 0; i < this->data.size(); i++)
+        cout << this->data[i];
+}
+
+void $ATTRIBUTE_LIST::printInfo()
+{
+    this->header.printInfo();
+    cout << endl;
+
+    if (this->header.getFlagNonResident() == 1)
+    {
+        for (int i = 0; i < this->runlist.size(); i++)
+        {
+            cout << "Run " << i << endl;
+            cout << "Cluster Count: " << this->runlist[i].clusterCount << endl;
+            cout << "Cluster Number: " << this->runlist[i].clusterNumber << endl;
+        }
+        cout << endl;
+    }
+
+    for (int i = 0; i < this->records.size(); i++)
+    {
+        cout << "Record " << i << endl;
+        cout << "Type ID: " << this->records[i].typeID << endl;
+        cout << "Record Length: " << this->records[i].recordLength << endl;
+        cout << "Name Length: " << this->records[i].nameLength << endl;
+        cout << "Offset to Name: " << this->records[i].offsetToName << endl;
+        cout << "Starting VCN: " << this->records[i].startingVCN << endl;
+        cout << "File Reference: " << this->records[i].fileReference << endl;
+        cout << "Attribute ID: " << this->records[i].attributeID << endl;
+        cout << "Name: " << this->records[i].name << endl << endl;
+    }
+}
+
 DWORD hexToDec(string hex)
 {
     DWORD num;
