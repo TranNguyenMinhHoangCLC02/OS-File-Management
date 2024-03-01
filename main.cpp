@@ -7,7 +7,7 @@
 #include "entry.h"
 #include "BPB.h"
 #include "MFT.h"
-
+#include "DATA.h"
 using namespace std;
 
 int main()
@@ -40,16 +40,16 @@ int main()
     // Entries entry;
     // entry.input(entries);
     // entry.print();
-    LPCWSTR disk = L"\\\\.\\C:";
+    LPCWSTR disk = L"\\\\.\\E:";
     BPB bpb(disk);
-    bpb.printBPBInfo();
-    bpb.printBPB();
+    // bpb.printBPBInfo();
+    // bpb.printBPB();
     int MFTStart = bpb.startingClusterOfMFT();
     int Sc = bpb.getSc();
     vector<vector<string>> entries;
     read_MFT(MFTStart, Sc, disk, entries);
-    vector<string> MFT;
+    // $DATA data("\\\\.\\E:", entries[0], bpb, 0);
+    // data.print();
     system("pause");
     return 0;
-
 }

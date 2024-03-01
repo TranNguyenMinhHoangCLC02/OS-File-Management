@@ -1,6 +1,7 @@
 #include "headerAttribute.h"
 #include "BPB.h"
 #include <sstream>
+#pragma once
 
 struct attributeRecord
 {
