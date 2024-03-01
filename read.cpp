@@ -108,3 +108,9 @@ void readSector(const char *diskPath, DWORD offset, BYTE sector[512])
     CloseHandle(hDevice);
 
 }
+
+void readClusters(LPCWSTR diskPath, unsigned long long startingCluster, unsigned long long sectorsPerCluster, DWORD sizeInBytes, vector<string> &storedValues)
+{
+    unsigned long long startingSector = startingCluster * sectorsPerCluster;
+    readSector(diskPath, startingSector, sizeInBytes, storedValues);
+}
