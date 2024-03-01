@@ -40,6 +40,13 @@ bool checkMFTEntry(BYTE *MFT)
     return false;
 }
 
+bool checkMFTEntry(vector<string> entry)
+{
+    if (entry[0] == "46" && entry[1] == "49" && entry[2] == "4C" && entry[3] == "45")
+        return true;
+    return false;
+}
+
 string byteArrayToHexString(const BYTE *data, size_t size)
 {
     stringstream hexString;
@@ -108,6 +115,46 @@ void read_MFT(unsigned int MFTStart, unsigned int sectors_per_cluster, LPCWSTR d
 
         fields1.insert(fields1.end(), fields2.begin(), fields2.end());
         entries.push_back(fields1);
+    }
+}
+
+void read_MFT2(unsigned int MFTStart, unsigned int sectors_per_cluster, vector<vector<string>> &entries) {
+    vector<string> storedValues1;
+    vector<string> storedValues2;
+    MFTStart *= sectors_per_cluster;
+    readSector(L"\\\\.\\C:", MFTStart, 512, storedValues1);
+    if (checkMFTEntry(storedValues1)) {
+        entries.push_back(storedValues1);
+        MFTStart+=1;
+        readSector(L"\\\\.\\C:", MFTStart, 512, storedValues2);
+        entries.push_back(storedValues2);
+        storedValues1.clear();
+        storedValues2.clear();
+    }
+    MFTStart+=2;
+    int i = 0;
+    while (i < 10) {
+        readSector(L"\\\\.\\C:", MFTStart, 512, storedValues1);
+        // if (checkMFTEntry(storedValues1)) {
+        //     entries.push_back(storedValues1);
+        //     MFTStart+=1;
+        //     readSector(L"\\\\.\\C:", MFTStart, 512, storedValues2);
+        //     entries.push_back(storedValues2);
+        //     storedValues1.clear();
+        //     storedValues2.clear();
+        // }
+        // else {
+        //     break;
+        // }
+
+        entries.push_back(storedValues1);
+        MFTStart+=1;
+        readSector(L"\\\\.\\C:", MFTStart, 512, storedValues2);
+        entries.push_back(storedValues2);
+        storedValues1.clear();
+        storedValues2.clear();
+        MFTStart+=2;
+        i++;
     }
 }
 
