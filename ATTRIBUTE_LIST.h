@@ -4,6 +4,9 @@
 
 struct attributeRecord
 {
+    vector<string> data; // original data from the disk
+
+    //converted data
     int typeID; // 0x00, 4 bytes
     int recordLength; // 0x04, 2 bytes
     int nameLength; // 0x06, 1 byte
@@ -16,6 +19,9 @@ struct attributeRecord
 
 struct dataRun
 {
+    vector<string> data; // original data from the disk
+
+    //converted data
     uint16_t clusterCount;
     uint64_t clusterNumber;
 };
@@ -23,11 +29,14 @@ struct dataRun
 class $ATTRIBUTE_LIST
 {
 private:
-    vector<string> entry;
+    vector<string> data;  // original data from the disk
+
+    //converted data
     NTFSAttributeHeader header;
         // lengthAttribute: length of the name of this attribute
         // positionOfAttribute: staring offset of the name of this attribute
     vector<attributeRecord> records;
+    vector<dataRun> runlist; // list of data runs in case of non-resident flag
 public:
     $ATTRIBUTE_LIST(vector<string> entry, DWORD offset, const char *diskPath, BPB bpb);
     void print();

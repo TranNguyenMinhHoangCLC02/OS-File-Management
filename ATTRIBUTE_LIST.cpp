@@ -2,7 +2,6 @@
 
 $ATTRIBUTE_LIST::$ATTRIBUTE_LIST(vector<string> entry, DWORD offset, const char *diskPath, BPB bpb)
 {
-    this->entry = entry;
     // get 16 first bytes to construct header
     vector<string> header;
     for (int i = 0; i < 16; i++)
@@ -32,9 +31,12 @@ $ATTRIBUTE_LIST::$ATTRIBUTE_LIST(vector<string> entry, DWORD offset, const char 
             item.fileReference = hexToDec(convertStringToLittleEdian(getStringFromVector(entry, current + 16, 8)));
             item.attributeID = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(entry, current + 24, 2)));
             item.name = hexToString(convertStringToLittleEdian(getStringFromVector(entry, current + item.offsetToName, item.nameLength)));
+            item.data = vector<string>(entry.begin() + current, entry.begin() + current + item.recordLength);
             this->records.push_back(item);
             current += item.recordLength;
         }
+
+        this->data = vector<string>(entry.begin() + offset, entry.begin() + offset + contentOffset + contentLength);
     }
     else // if non-resident flag
     {
@@ -42,8 +44,8 @@ $ATTRIBUTE_LIST::$ATTRIBUTE_LIST(vector<string> entry, DWORD offset, const char 
         WORD offsetToRunList = hexToDec(convertStringToLittleEdian(getStringFromVector(entry, current, 2)));
         current = offset + offsetToRunList;
 
-        vector<dataRun> runs;  // list of data runs
-        while (entry[current] != "00" && entry[current + 1] != "00")
+        runlist = {};  // list of data runs
+        while ((entry[current] != "00" && entry[current + 1] != "00") && current < entry.size())
         {
             dataRun run;
             string firstByte = entry[current];
@@ -59,15 +61,18 @@ $ATTRIBUTE_LIST::$ATTRIBUTE_LIST(vector<string> entry, DWORD offset, const char 
             for (int i = 0; i < bytesToParseCount; i++)
                 runOffset += entry[current + bytesToParseNum + i];
             run.clusterNumber = hexToDec(convertStringToLittleEdian(runOffset));
-            runs.push_back(run);
+            run.data = vector<string>(entry.begin() + current, entry.begin() + current + bytesToParseNum + bytesToParseCount + 1);
+            runlist.push_back(run);
             current += bytesToParseNum + bytesToParseCount + 1;
         }
+
+        this->data = vector<string>(entry.begin() + offset, entry.begin() + current + 1);
 
         // read clusters provided by data runs
         int sectorPercluster = bpb.getSc();
         vector<string> clusterData;
-        for (int i = 0; i < runs.size(); i++)
-            readClusters(charToLPCWSTR(diskPath), runs[i].clusterNumber, sectorPercluster, runs[i].clusterCount * sectorPercluster * bpb.getSectorSize(), clusterData);
+        for (int i = 0; i < runlist.size(); i++)
+            readClusters(charToLPCWSTR(diskPath), runlist[i].clusterNumber, sectorPercluster, runlist[i].clusterCount * sectorPercluster * bpb.getSectorSize(), clusterData);
 
         // get list of records
         current = 0;
@@ -82,6 +87,7 @@ $ATTRIBUTE_LIST::$ATTRIBUTE_LIST(vector<string> entry, DWORD offset, const char 
             item.fileReference = hexToDec(convertStringToLittleEdian(getStringFromVector(clusterData, current + 16, 8)));
             item.attributeID = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(clusterData, current + 24, 2)));
             item.name = hexToString(convertStringToLittleEdian(getStringFromVector(clusterData, current + item.offsetToName, item.nameLength)));
+            item.data = vector<string>(clusterData.begin() + current, clusterData.begin() + current + item.recordLength);
             this->records.push_back(item);
             current += item.recordLength;
         }
