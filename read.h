@@ -15,3 +15,4 @@ string getHexRepresentation(const char* data, size_t size);
 void getArrayFromHex(const string& hexString, vector<string>& storedValues);
 void readSector(LPCWSTR diskPath, unsigned long long offsetSector, DWORD size, vector<string> &storedValues);
 void readSector(const char *diskPath, DWORD offset, BYTE sector[512]);
+void readClusters(LPCWSTR diskPath, unsigned long long startingCluster, unsigned long long sectorsPerCluster, DWORD sizeInBytes, vector<string> &storedValues);
