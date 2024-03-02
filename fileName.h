@@ -3,6 +3,7 @@
 #include "BPB.h"
 #include "entry.h"
 #include "headerAttribute.h"
+#include "ATTRIBUTE_LIST.h"
 
 vector<string> extractHeader(vector<string> entry)
 {
@@ -16,6 +17,7 @@ class FileName
 {
 private:
     vector<string> entry;
+    vector<dataRun> runlist;
     NTFSAttributeHeader header;
     int sizeAttribute;
     int offset;
@@ -23,7 +25,18 @@ private:
     int nameSpace;
     string fileName;
 public:
-    FileName(vector<string> entry);
+    FileName()
+    {
+        this->header = NTFSAttributeHeader();
+        this->entry = {};
+        this->runlist = {};
+        this->sizeAttribute = 0;
+        this->offset = 0;
+        this->lengthFileName = 0;
+        this->nameSpace = 0;
+        this->fileName = "";
+    }
+    FileName(vector<string> entry, BPB bpb, const char *diskPath);
     void print();
     string getFileName();
     int getSizeAttribute();

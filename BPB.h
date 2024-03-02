@@ -1,5 +1,6 @@
 #include "read.h"
 #include "entry.h"
+#pragma once
 
 class BPB
 {
