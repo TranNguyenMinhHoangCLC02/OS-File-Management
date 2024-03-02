@@ -43,9 +43,6 @@
         "sstream": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
-        "typeinfo": "cpp",
-        "xutility": "cpp",
-        "xstring": "cpp",
-        "ios": "cpp"
+        "typeinfo": "cpp"
     }
 }

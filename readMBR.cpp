@@ -1,6 +1,6 @@
 #include "read.h"
 
-void readMBR(const char *diskPath, vector<string> &storedValues)
+void readMBR(LPCWSTR diskPath, vector<string> &storedValues)
 {
     readSector(diskPath, 0, 512, storedValues);
 }

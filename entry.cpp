@@ -142,7 +142,7 @@ void readEntireEntries(DWORD startSectorOfRDET, vector<vector<string>> &entries)
     vector<string> storedValues;
     while (true)
     {
-        readSector("\\\\.\\F:", startSectorOfRDET * 512, 512, storedValues);
+        readSector(L"\\\\.\\F:", startSectorOfRDET, 512, storedValues);
         if (checkEmpty(storedValues) || storedValues.empty())
             break;
         for (int i = 0; i < storedValues.size(); i += 32)

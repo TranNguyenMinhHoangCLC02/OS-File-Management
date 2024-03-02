@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include "read.h"
+#include "math.h"
 
 using namespace std;
 
@@ -24,6 +25,28 @@ int convertHexadecimalToDecimal(string input)
     int num;
     stringstream(input) >> hex >> num;
     return num;
+}
+
+string convertNumToBinary(int num)
+{
+    string result;
+    while (num > 0)
+    {
+        result = to_string(num % 2) + result;
+        num /= 2;
+    }
+    return result;
+}
+
+int decFromSigned2Complement(string input)
+{
+    int result = 0;
+    if (input[0] == '1')
+        result += -1 * pow(2, input.size() - 1);
+    for (int i = 1; i < input.size(); i++)
+        if (input[i] == '1')
+            result += pow(2, input.size() - 1 - i);
+    return result;
 }
 
 string convertToUpperCase(string input)
@@ -50,7 +73,7 @@ void getArrayFromHex(const string& hexString, vector<string>& storedValues)
         storedValues.push_back(temp);
 }
 
-void readSector(const char *diskPath, DWORD offset, DWORD size, vector<string> &storedValues)
+void readSector(LPCWSTR diskPath, unsigned long long offsetSector, DWORD size, vector<string> &storedValues)
 {
     char* buffer = new char[size];
     HANDLE hDevice = CreateFileA(diskPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -61,8 +84,10 @@ void readSector(const char *diskPath, DWORD offset, DWORD size, vector<string> &
     }
     DWORD bytesRead;
     string hexRepresentation;
-    SetFilePointer(hDevice, offset, NULL, FILE_BEGIN);
-    if (ReadFile(hDevice, buffer, size, &bytesRead, NULL))  
+    LARGE_INTEGER offset;
+    offset.QuadPart = offsetSector * 512;
+    SetFilePointerEx(hDevice, offset, NULL, FILE_BEGIN); // Use SetFilePointerEx for LARGE_INTEGER offset
+    if (ReadFile(hDevice, buffer, size, &bytesRead, NULL)) 
         hexRepresentation = getHexRepresentation(buffer, bytesRead);
     else 
         cerr << "Failed to read VBR. Error code: " << GetLastError() << endl;
@@ -98,4 +123,11 @@ void readSector(const char *diskPath, DWORD offset, BYTE* data, DWORD size) {
     if (!ReadFile(hDevice, data, size, &bytesRead, NULL))
         cerr << "Failed to read sector. Error code: " << GetLastError() << endl;
     CloseHandle(hDevice);
+}
+}
+
+void readClusters(LPCWSTR diskPath, unsigned long long startingCluster, unsigned long long sectorsPerCluster, DWORD sizeInBytes, vector<string> &storedValues)
+{
+    unsigned long long startingSector = startingCluster * sectorsPerCluster;
+    readSector(diskPath, startingSector, sizeInBytes, storedValues);
 }
