@@ -84,5 +84,18 @@ void readSector(const char *diskPath, DWORD offset, BYTE sector[512])
     if (!ReadFile(hDevice, sector, 512, &bytesRead, NULL))
         cerr << "Failed to read VBR. Error code: " << GetLastError() << endl;
     CloseHandle(hDevice);
+}
 
+void readSector(const char *diskPath, DWORD offset, BYTE* data, DWORD size) {
+    HANDLE hDevice = CreateFileA(diskPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, NULL);
+    if (hDevice == INVALID_HANDLE_VALUE) {
+        std::cerr << "Failed to open disk. Error code: " << GetLastError() << endl;
+        return;
+    }
+    SetFilePointer(hDevice, offset, NULL, FILE_BEGIN);
+    DWORD bytesRead;
+    if (!ReadFile(hDevice, data, size, &bytesRead, NULL))
+        cerr << "Failed to read sector. Error code: " << GetLastError() << endl;
+    CloseHandle(hDevice);
 }

@@ -40,8 +40,11 @@ public:
     void readEntry(vector<vector<string>> entry);
     void printEntry();
     void print();
+    EntryAttribute getAttribute(){ return attribute;}
+    int getFirstCluster(){ return firstCluster; };
     string getName() { return name; };
     BYTE getStatus() { return status; };
+    int getSize() { return size; }
     friend string getFullNameFromASetOfEntry(vector<vector<string>> entry);
     friend string getNameFromSecondaryEntry(vector<string> entry);
 };
@@ -50,8 +53,12 @@ class Entries
 {
 private:
     vector<Entry*> entries;
+    WORD NRDET; // Number entry of RDET
 public:
     void input(vector<vector<string>> entries);
+    vector<int> getListClusters();
     void print();
+    WORD getNRDET() { return entries.size(); }
+    vector<Entry*> getEntries() {return entries;}
     ~Entries();
 };

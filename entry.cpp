@@ -142,15 +142,15 @@ void readEntireEntries(DWORD startSectorOfRDET, vector<vector<string>> &entries)
     vector<string> storedValues;
     while (true)
     {
-        readSector("\\\\.\\E:", startSectorOfRDET * 512, 512, storedValues);
+        readSector("\\\\.\\F:", startSectorOfRDET * 512, 512, storedValues);
         if (checkEmpty(storedValues) || storedValues.empty())
             break;
         for (int i = 0; i < storedValues.size(); i += 32)
         {
             vector<string> entry;
-            for (int j = 0; j < 32; j++)
+            for (int j = 0; j < 32; j++) {
                 entry.push_back(storedValues[i + j]);
-                cout << storedValues[i+j] << " ";
+                // cout << storedValues[i+j] << " ";
             }
             if (checkEmpty(entry))
                 break;
@@ -198,6 +198,15 @@ void Entries::input(vector<vector<string>> entries)
         newEntry->readEntry(temp);
         this->entries.push_back(newEntry);
     }
+}
+
+vector<int> Entries::getListClusters(){
+    vector<int> listClusters;
+    for(Entry* e : entries){
+        // cout << e->getFirstCluster() << " ";
+        listClusters.push_back(e->getFirstCluster());
+    }
+    return listClusters;
 }
 
 void Entries::print()

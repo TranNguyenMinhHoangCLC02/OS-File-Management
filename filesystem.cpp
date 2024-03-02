@@ -27,12 +27,12 @@
 //     bootSector.readBootSector(bootSectorBytes);
 // }
 
-File::File(const char* disk_Path) : diskPath(disk_Path) {
-    BYTE bootSectorBytes[512];
-    readSector(diskPath, 0, bootSectorBytes); // Đọc Boot Sector
-    bootSector.readBootSector(bootSectorBytes);
+// File::File(const char* disk_Path) : diskPath(disk_Path) {
+//     BYTE bootSectorBytes[512];
+//     readSector(diskPath, 0, bootSectorBytes); // Đọc Boot Sector
+//     bootSector.readBootSector(bootSectorBytes);
 
-    fatTable = FatTable(diskPath);
+//     fatTable = FatTable(diskPath);
 
     
-}
+// }

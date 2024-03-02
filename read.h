@@ -1,4 +1,6 @@
 #pragma once
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -9,3 +11,4 @@ string getHexRepresentation(const char* data, size_t size);
 void getArrayFromHex(const string& hexString, vector<string>& storedValues);
 void readSector(const char *diskPath, DWORD offset, DWORD size, vector<string> &storedValues);
 void readSector(const char *diskPath, DWORD offset, BYTE sector[512]);
+void readSector(const char *diskPath, DWORD offset, BYTE* data, DWORD size);
