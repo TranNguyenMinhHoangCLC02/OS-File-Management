@@ -50,8 +50,6 @@ int main()
     // read_MFT(MFTStart, Sc, disk, entries);
     // vector<string> MFT;
     read_MFT2(MFTStart, Sc, entries);
-    printMFT(entries);
-    system("pause");
     return 0;
 
 }
