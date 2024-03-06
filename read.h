@@ -1,10 +1,12 @@
 #pragma once
+#include <windows.h>
 #include <iostream>
 #include <vector>
 #include <math.h>
 
 using namespace std;
 
+string decimalToHex(int decimal);
 string convertHexToUTF16(string input);
 int convertHexadecimalToDecimal(string input);
 string convertNumToBinary(int num);

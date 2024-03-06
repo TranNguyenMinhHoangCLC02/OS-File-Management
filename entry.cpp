@@ -133,7 +133,7 @@ void Entry::readEntry(vector<vector<string>> entry)
     this->attribute = (EntryAttribute)convertHexadecimalToDecimal(primaryEntry[0xB]);
     string temp = convertStringToLittleEdian(getStringFromVector(primaryEntry, 0x1C, 4));
     this->size = convertHexadecimalToDecimal(temp);
-    temp = convertStringToLittleEdian(getStringFromVector(primaryEntry, 0x1A, 2)) + convertStringToLittleEdian(getStringFromVector(primaryEntry, 0x14, 2));
+    temp =  convertStringToLittleEdian(getStringFromVector(primaryEntry, 0x14, 2)) + convertStringToLittleEdian(getStringFromVector(primaryEntry, 0x1A, 2));
     this->firstCluster = convertHexadecimalToDecimal(temp);
 }
 
@@ -202,9 +202,8 @@ void Entries::input(vector<vector<string>> entries)
 
 vector<int> Entries::getListClusters(){
     vector<int> listClusters;
-    for(Entry* e : entries){
-        // cout << e->getFirstCluster() << " ";
-        listClusters.push_back(e->getFirstCluster());
+    for(int i = 0; i < entries.size(); i++){
+        listClusters.push_back(entries[i]->getFirstCluster());
     }
     return listClusters;
 }
@@ -223,4 +222,57 @@ Entries::~Entries()
 {
     for (int i = 0; i < entries.size(); i++)
         delete entries[i];
+}
+
+vector<Item*> Entries::getRoot(BootSector bootSector, FatTable fatTable){
+    vector<int> list_First_Clusters = getListClusters();
+    vector<vector<int>> list_Clusters_Of_Entry = fatTable.listClustersOfEntry(list_First_Clusters);
+    
+
+    vector<vector<DWORD>> list_Sector_Of_Entry;
+    for(int i = 0; i < list_Clusters_Of_Entry.size(); i++){
+        vector<DWORD> listSector;
+        for(int j = 0; j < list_Clusters_Of_Entry[i].size(); j++){
+            DWORD offset = bootSector.getSb() + bootSector.getSf() * bootSector.getNf() + (list_Clusters_Of_Entry[i][j]- 2) * bootSector.getSc();
+            cout << offset << " ";
+            listSector.push_back(offset);
+        }
+        list_Sector_Of_Entry.push_back(listSector);
+    }
+
+
+    BYTE* data;
+    for(int i = 0; i < list_Sector_Of_Entry.size(); i++){
+        vector<BYTE> binary_data;
+        int size = 0;
+        for(int j = 0; j < list_Sector_Of_Entry[i].size() ; j++){
+            //đọc sdet
+            cout << list_Sector_Of_Entry[i][j] << " ";
+            // if(entries[i]->getAttribute() == Directory){
+            //     vector<vector<string>> s_entries;
+            //     DWORD startSectorOfSDET = list_Sector_Of_Entry[i][j];
+            //     readEntireEntries(startSectorOfSDET, s_entries);
+            //     removeFaultyEntry(s_entries);
+            //     Entries entry;
+            //     entry.input(s_entries);     
+            //     entry.print();
+            //     entry.getRoot(bootSector, fatTable);
+            // } else {
+            //     data = new BYTE[bootSector.getSc() * 512];
+            //     readSector("\\\\.\\F:", list_Sector_Of_Entry[i][j] * 512, data, bootSector.getSc() * 512);
+            //     for(int t = 0; t < bootSector.getSc() * 512 && size < entries[i]->getSize(); t++){
+            //         binary_data.push_back(data[t]);
+            //         size ++;
+            //     }
+            //     delete[] data;
+            // }
+            
+        }
+        string content = "";
+        for(int i = 0; i < binary_data.size(); i++)
+        {
+            content += decimalToHex(binary_data[i]) ;
+        }
+        cout << convertHexToUTF16(content) << endl;
+    }
 }

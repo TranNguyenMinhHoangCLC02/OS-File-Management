@@ -6,6 +6,8 @@
 #include <string>
 #include <iostream>
 #include "read.h"
+#include "bootSector.h"
+#include "fatTable.h"
 
 using namespace std;
 
@@ -48,7 +50,9 @@ public:
     friend string getFullNameFromASetOfEntry(vector<vector<string>> entry);
     friend string getNameFromSecondaryEntry(vector<string> entry);
 };
-
+class Item{};
+class Folder : public Item{};
+class File : public Item{};
 class Entries
 {
 private:
@@ -61,4 +65,5 @@ public:
     WORD getNRDET() { return entries.size(); }
     vector<Entry*> getEntries() {return entries;}
     ~Entries();
+    vector<Item*> getRoot(BootSector bootSector, FatTable fatTable);   
 };

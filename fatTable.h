@@ -10,10 +10,9 @@ class FatTable{
 private:
     vector<BYTE> fatTable;
 public:
-    // FatTable();
-    FatTable(const char* diskPath);
-    // FatTable(WORD Sb, BYTE sector[]);
+    FatTable(){}
+    FatTable& operator= (const FatTable &fatTable);
+    vector<vector<int>> listClustersOfEntry(vector<int> listFirstCLusters);
+    FatTable(const char* diskPath, DWORD Sf , WORD Sb);
     vector<int> getClusters(int firstCluster);
-    vector<BYTE> getFatTable();
-    void printFatTable();
 };

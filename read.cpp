@@ -1,5 +1,4 @@
 #include <iostream>
-#include <windows.h>
 #include <iomanip>
 #include <sstream>
 #include <vector>
@@ -7,6 +6,12 @@
 #include "math.h"
 
 using namespace std;
+
+string decimalToHex(int decimal) {
+    std::stringstream stream;
+    stream << std::hex << setw(2) << setfill('0') << uppercase << decimal;
+    return stream.str();
+}
 
 string convertHexToUTF16(string input)
 {
@@ -76,7 +81,7 @@ void getArrayFromHex(const string& hexString, vector<string>& storedValues)
 void readSector(LPCWSTR diskPath, unsigned long long offsetSector, DWORD size, vector<string> &storedValues)
 {
     char* buffer = new char[size];
-    HANDLE hDevice = CreateFileA(diskPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+    HANDLE hDevice = CreateFileW(diskPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, NULL);
     if (hDevice == INVALID_HANDLE_VALUE) {
         std::cerr << "Failed to open disk. Error code: " << GetLastError() << endl;
@@ -123,7 +128,6 @@ void readSector(const char *diskPath, DWORD offset, BYTE* data, DWORD size) {
     if (!ReadFile(hDevice, data, size, &bytesRead, NULL))
         cerr << "Failed to read sector. Error code: " << GetLastError() << endl;
     CloseHandle(hDevice);
-}
 }
 
 void readClusters(LPCWSTR diskPath, unsigned long long startingCluster, unsigned long long sectorsPerCluster, DWORD sizeInBytes, vector<string> &storedValues)
