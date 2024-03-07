@@ -28,6 +28,8 @@ void removeFaultyEntry(vector<vector<string>> &entries);
 string convertStringToLittleEdian(string input);
 string getStringFromVector(vector<string> storedValues, int start, int length);
 
+class Item;
+
 class Entry
 {
 private:
@@ -47,12 +49,42 @@ public:
     string getName() { return name; };
     BYTE getStatus() { return status; };
     int getSize() { return size; }
+    void setName(string name) { this->name = name; }
     friend string getFullNameFromASetOfEntry(vector<vector<string>> entry);
     friend string getNameFromSecondaryEntry(vector<string> entry);
+    Item* getFile(BootSector bootSector, FatTable fatTable);
 };
-class Item{};
-class Folder : public Item{};
-class File : public Item{};
+
+class Item{
+    Entry *entry;
+public:
+    void setEntry(Entry*& entry);
+    void virtual addItem(Item* item) = 0;
+    void virtual print();
+    vector<Item*> virtual getSubFolder(){};
+};
+
+class Folder : public Item{
+    vector<Item*> subfolder;
+public:
+    Folder();
+    vector<Item*> getSubFolder();
+    void addItem(Item* item);
+    void print() override;
+};
+
+class File : public Item{
+    string data;
+public:
+    // File() : Item (){}
+    void addItem(Item* item) {}
+    vector<Item*> getSubFolder() {
+        vector<Item*> a;
+        return a;
+    }
+
+};
+
 class Entries
 {
 private:
@@ -61,9 +93,13 @@ private:
 public:
     void input(vector<vector<string>> entries);
     vector<int> getListClusters();
+    vector<vector<DWORD>> getListSector(BootSector bootSector, FatTable fatTable);
     void print();
     WORD getNRDET() { return entries.size(); }
     vector<Entry*> getEntries() {return entries;}
     ~Entries();
-    vector<Item*> getRoot(BootSector bootSector, FatTable fatTable);   
+    Item* getRootDirectory(BootSector bootSector, FatTable fatTable);  
+    Item* getSubDirectory(BootSector bootSector, FatTable fatTable, string name);
+
+    void removeEntry(int index); 
 };

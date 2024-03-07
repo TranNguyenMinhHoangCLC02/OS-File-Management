@@ -32,8 +32,11 @@ int main()
     entry.print();
 
     // build tree
-    entry.getRoot(bootSector, fatTable);
-
+    Item* root = entry.getRootDirectory(bootSector, fatTable);
+    root->setEntry(entry.getEntries()[0]);
+    
+    cout << "123";
+    root->print();
 
     // vector<int> list_First_Clusters = entry.getListClusters();
     

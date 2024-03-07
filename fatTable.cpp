@@ -20,6 +20,7 @@ FatTable& FatTable::operator= (const FatTable &fatTable){
 vector<int> FatTable::getClusters(int firstCluster) {
     vector<int> clusters;
     int currentCluster = firstCluster;
+    
     int eoc_sign[] = {(int)0x00000000, (int)0xFFFFFF0, (int)0xFFFFFFF, (int)0XFFFFFF7, (int)0xFFFFFF8, (int)0xFFFFFFF0};
     while (true){
         bool check = false;
@@ -45,7 +46,9 @@ vector<int> FatTable::getClusters(int firstCluster) {
 vector<vector<int>> FatTable::listClustersOfEntry(vector<int> listFirstCLusters){
     vector<vector<int>> listClusters;
     for(int i : listFirstCLusters){
+        // cout << i << " ";
         listClusters.push_back(getClusters(i));
     }
+    // cout << "hahsha ";
     return listClusters;
 }
