@@ -133,7 +133,7 @@ void Entry::readEntry(vector<vector<string>> entry)
     this->attribute = (EntryAttribute)convertHexadecimalToDecimal(primaryEntry[0xB]);
     string temp = convertStringToLittleEdian(getStringFromVector(primaryEntry, 0x1C, 4));
     this->size = convertHexadecimalToDecimal(temp);
-    temp = convertStringToLittleEdian(getStringFromVector(primaryEntry, 0x1A, 2)) + convertStringToLittleEdian(getStringFromVector(primaryEntry, 0x14, 2));
+    temp =  convertStringToLittleEdian(getStringFromVector(primaryEntry, 0x14, 2)) + convertStringToLittleEdian(getStringFromVector(primaryEntry, 0x1A, 2));
     this->firstCluster = convertHexadecimalToDecimal(temp);
 }
 
@@ -142,14 +142,16 @@ void readEntireEntries(DWORD startSectorOfRDET, vector<vector<string>> &entries)
     vector<string> storedValues;
     while (true)
     {
-        readSector(L"\\\\.\\E:", startSectorOfRDET, 512, storedValues);
+        readSector(L"\\\\.\\F:", startSectorOfRDET, 512, storedValues);
         if (checkEmpty(storedValues) || storedValues.empty())
             break;
         for (int i = 0; i < storedValues.size(); i += 32)
         {
             vector<string> entry;
-            for (int j = 0; j < 32; j++)
+            for (int j = 0; j < 32; j++) {
                 entry.push_back(storedValues[i + j]);
+                // cout << storedValues[i+j] << " ";
+            }
             if (checkEmpty(entry))
                 break;
             entries.push_back(entry);
@@ -194,8 +196,19 @@ void Entries::input(vector<vector<string>> entries)
         vector<vector<string>> temp = extractEntry(entries);
         Entry *newEntry = new Entry();
         newEntry->readEntry(temp);
-        this->entries.push_back(newEntry);
+        if(newEntry->getAttribute() != 0x16)
+            this->entries.push_back(newEntry);
+        else 
+            delete newEntry;
     }
+}
+
+vector<int> Entries::getListClusters(){
+    vector<int> listClusters;
+    for(int i = 0; i < entries.size(); i++){
+        listClusters.push_back(entries[i]->getFirstCluster());
+    }
+    return listClusters;
 }
 
 void Entries::print()
@@ -212,4 +225,146 @@ Entries::~Entries()
 {
     for (int i = 0; i < entries.size(); i++)
         delete entries[i];
+}
+
+void Entries::removeEntry(int index){
+    delete []entries[index];
+    entries.erase(entries.begin() + index);
+}
+
+Item* Entries::getSubDirectory(BootSector bootSector, FatTable fatTable, string name){
+    entries.erase(entries.begin() + 1);
+    entries[0]->setName(name);
+    return getRootDirectory(bootSector, fatTable);
+}
+
+Item* Entry::getFile(BootSector bootSector, FatTable fatTable){
+    return  new File;
+}
+
+vector<vector<DWORD>> Entries::getListSector(BootSector bootSector, FatTable fatTable){
+    vector<int> list_First_Clusters = getListClusters();
+    vector<vector<int>> list_Clusters_Of_Entry = fatTable.listClustersOfEntry(list_First_Clusters);
+    
+
+    vector<vector<DWORD>> list_Sector_Of_Entry;
+    for(int i = 0; i < list_Clusters_Of_Entry.size(); i++){
+        vector<DWORD> listSector;
+        for(int j = 0; j < list_Clusters_Of_Entry[i].size(); j++){
+            DWORD offset = bootSector.getSb() + bootSector.getSf() * bootSector.getNf() + (list_Clusters_Of_Entry[i][j]- 2) * bootSector.getSc();
+            cout << offset << " ";
+            listSector.push_back(offset);
+        }
+        list_Sector_Of_Entry.push_back(listSector);
+    }
+    return list_Sector_Of_Entry;
+}
+
+
+Item* Entries::getRootDirectory(BootSector bootSector, FatTable fatTable){
+    vector<vector<DWORD>> list_Sector = this->getListSector(bootSector, fatTable);
+// đoạn này chừng làm gọn lại là truyền vào list first cluster trả ra vecvtor<vector<int>> 
+// list sector của mỗi cái vector<int> là dãy cluster bắt dầu từ first cluster đó
+
+    Item* res = new Folder;
+        res->setEntry(entries[0]);
+    for(int i = 1; i < list_Sector.size(); i++){
+        Item* item;
+        for(int j = 0; j < list_Sector[i].size() ; j++){
+            //đọc sdet
+            if(entries[i]->getAttribute() == Directory){
+                vector<vector<string>> s_entries;
+                DWORD startSectorOfSDET = list_Sector[i][j];
+                readEntireEntries(startSectorOfSDET, s_entries);
+                removeFaultyEntry(s_entries);
+                Entries entry;
+                entry.input(s_entries); 
+
+                item = entry.getSubDirectory(bootSector, fatTable, entries[i]->getName());
+                item->print();
+            } else if(entries[i]->getAttribute() == Archive){
+                item = entries[i]->getFile(bootSector, fatTable);
+                item->print();
+                cout << "22";
+            }
+        }
+        res->addItem(item);
+    }
+
+    // Item* res = new Folder;
+    // BYTE* data;
+    // for(int i = 0; i < list_Sector.size(); i++){
+    //     vector<BYTE> binary_data;
+    //     int size = 0;
+    //     for(int j = 0; j < list_Sector[i].size() ; j++){
+    //         //đọc sdet
+    //         if(entries[i]->getAttribute() == Directory){
+    //             vector<vector<string>> s_entries;
+    //             DWORD startSectorOfSDET = list_Sector[i][j];
+    //             readEntireEntries(startSectorOfSDET, s_entries);
+    //             removeFaultyEntry(s_entries);
+    //             Entries entry;
+    //             entry.input(s_entries);    
+
+    //             cout << "phihoang" << endl;
+    //             Item* item = entry.getSubDirectory(bootSector, fatTable);
+    //             cout << "minhhoang" << endl;
+    //             item->setEntry(entries[i]);
+    //             res->addItem(item);
+
+    //         } else if(entries[i]->getAttribute() == Archive){
+    //             Item* item = entries[i]->getFile(bootSector, fatTable);
+                
+    //             item->setEntry(entries[i]);
+    //             res->addItem(item);
+    //             cout << "thanhdat";
+    //             // data = new BYTE[bootSector.getSc() * 512];
+    //             // readSector("\\\\.\\F:", list_Sector_Of_Entry[i][j] * 512, data, bootSector.getSc() * 512);
+    //             // for(int t = 0; t < bootSector.getSc() * 512 && size < entries[i]->getSize(); t++){
+    //             //     binary_data.push_back(data[t]);
+    //             //     size ++;
+    //             // }
+    //             // delete[] data;
+    //         }
+            
+    //     }
+        // string content = "";
+        // for(int i = 0; i < binary_data.size(); i++)
+        // {
+        //     content += decimalToHex(binary_data[i]) ;
+        // }
+        // cout << convertHexToUTF16(content) << endl;
+    // }
+    return res;
+}
+
+void Item::setEntry(Entry* &entry){
+    this->entry = entry;
+    this->entry->printEntry();
+}
+
+
+Folder::Folder(){}
+
+
+
+
+void Folder::print(){
+    Item::print();
+    for(Item* i : subfolder)
+        i->print();
+}
+
+vector<Item*> Folder::getSubFolder(){
+    return subfolder;
+}
+
+void Folder::addItem(Item* item){
+    for(Item* i : item->getSubFolder()){
+        this->subfolder.push_back(i);
+    }
+}
+
+void Item::print(){
+    cout << entry->getName() << " ";
 }

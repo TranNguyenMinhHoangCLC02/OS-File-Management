@@ -23,7 +23,7 @@ public:
     void printBootSector();
     BYTE getstartClusterRDET() { return startClusterRDET; }
     DWORD getSf() { return Sf; }
-    DWORD getNf() { return Nf; }
+    BYTE getNf() { return Nf; }
     WORD getSb() { return Sb; }
     BYTE getSc() { return Sc; }
 };

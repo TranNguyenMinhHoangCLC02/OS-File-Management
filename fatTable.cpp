@@ -1,49 +1,54 @@
 #include "fatTable.h"
+#include <cstring>
 
-FatTable::FatTable(){
-    BootSector bootSector;
-    BYTE sector[512];
-    readSector("\\\\.\\C:", 0, sector);
-    bootSector.readBootSector(sector);
-    DWORD Sf = bootSector.getSf(); // Sectors per FAT
-    DWORD Nf = bootSector.getNf(); // Number of FATs
-    WORD Sb = bootSector.getSb(); // Sector of boot sector
-    DWORD startClusterRDET = bootSector.getstartClusterRDET(); // Start cluster of RDET
-    fatTable.resize(Sf * 512);
-    readSector("\\\\.\\C:", Sb * 512, fatTable.data());
-}
-
-FatTable::FatTable(const char* diskPath){
-    BootSector bootSector;
-    BYTE sector[512];
-    readSector(diskPath, 0, sector);
-    bootSector.readBootSector(sector);
-    DWORD Sf = bootSector.getSf(); // Sectors per FAT
-    DWORD Nf = bootSector.getNf(); // Number of FATs
-    WORD Sb = bootSector.getSb(); // Sector of boot sector
-    DWORD startClusterRDET = bootSector.getstartClusterRDET(); // Start cluster of RDET
-    fatTable.resize(Sf * 512);
-    readSector(diskPath, Sb * 512, fatTable.data());
-}
-
-vector<BYTE> FatTable::getFatTable(){
-    return fatTable;
-}
-
-void FatTable::printFatTable(){
-    for (int i = 0; i < fatTable.size(); i++){
-        if (i % 16 == 0){
-            cout << endl;
-        }
-        cout << hex << setw(2) << setfill('0') << (int)fatTable[i] << " ";
+FatTable::FatTable(const char* diskPath, DWORD Sf, WORD Sb){
+    // Read FAT table
+    BYTE* data = new BYTE[Sf * 512];
+    readSector(diskPath, Sb * 512, data, Sf * 512);
+    for(int t = 0; t < Sf * 512; t++){
+        fatTable.push_back(data[t]);
     }
-    cout << endl;
+    delete[] data;
 }
 
-// int main(int argc, char ** argv)
-// {
-//     FatTable fatTable("\\\\.\\D:");
-//     fatTable.printFatTable();
-//     system("pause");
-//     return 0;
-// }
+FatTable& FatTable::operator= (const FatTable &fatTable){
+        this->fatTable = fatTable.fatTable;
+        return *this;
+}
+
+
+vector<int> FatTable::getClusters(int firstCluster) {
+    vector<int> clusters;
+    int currentCluster = firstCluster;
+    
+    int eoc_sign[] = {(int)0x00000000, (int)0xFFFFFF0, (int)0xFFFFFFF, (int)0XFFFFFF7, (int)0xFFFFFF8, (int)0xFFFFFFF0};
+    while (true){
+        bool check = false;
+        for(int i : eoc_sign)
+            if (i == currentCluster)
+            {
+                check = true;
+                break;
+            }
+        if (check)
+            break;
+        clusters.push_back(currentCluster);
+        int INDEX = 0;
+        for(int i = 3; i >= 0; i--){
+            INDEX *= 256;
+            INDEX += fatTable[currentCluster * 4 + i];
+        }
+        currentCluster = INDEX;
+    }
+    return clusters;
+}
+
+vector<vector<int>> FatTable::listClustersOfEntry(vector<int> listFirstCLusters){
+    vector<vector<int>> listClusters;
+    for(int i : listFirstCLusters){
+        // cout << i << " ";
+        listClusters.push_back(getClusters(i));
+    }
+    // cout << "hahsha ";
+    return listClusters;
+}

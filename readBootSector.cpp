@@ -1,5 +1,6 @@
 #include "bootSector.h"
 #include "read.h"
+#include "entry.h"
 
 BootSector::BootSector() {
     Sc = 0;
@@ -52,10 +53,17 @@ void BootSector::printBootSector() {
 // int main(int argc, char ** argv)
 // {
 //     BYTE sector[512];
-//     readSector("\\\\.\\D:", 0, sector);
+//     readSector("\\\\.\\F:", 0, sector);
 //     BootSector bootSector;
 //     bootSector.readBootSector(sector);
 //     bootSector.printBootSector();
+
+//     Entries entries;
+//     entries.readEntireEntries(bootSector.getstartClusterRDET() * bootSector.getSc());
+//     entries.readEntries();
+
+
+    
 //     system("pause");
 //     return 0;
 // }
