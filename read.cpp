@@ -2,10 +2,44 @@
 #include <iomanip>
 #include <sstream>
 #include <vector>
+#include <bitset>
 #include "read.h"
 #include "math.h"
+#include <windows.h>
 
 using namespace std;
+
+LPCWSTR charToLPCWSTR(const char* input) {
+    // Calculate the size of the buffer needed for the wide-character string
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, input, -1, NULL, 0);
+
+    // Allocate memory for the wide-character string
+    wchar_t* wide_string = new wchar_t[size_needed];
+
+    // Convert the narrow string to wide-character string
+    MultiByteToWideChar(CP_UTF8, 0, input, -1, wide_string, size_needed);
+
+    // Return the LPCWSTR representation of the wide-character string
+    return wide_string;
+}
+
+
+// LPCWSTR charToLPCWSTR(const char* charString)
+// {
+//     int size = MultiByteToWideChar(CP_UTF8, 0, charString, -1, nullptr, 0);
+//     if (size == 0) {
+//         cerr << "Failed to get required buffer size. Error code: " << GetLastError() << std::endl;
+//         return nullptr;
+//     }
+
+//     vector<wchar_t> buffer(size);
+//     if (MultiByteToWideChar(CP_UTF8, 0, charString, -1, buffer.data(), size) == 0) {
+//         cerr << "Failed to convert string. Error code: " << GetLastError() << std::endl;
+//         return nullptr;
+//     }
+//     cerr << buffer.data() << endl;
+//     return buffer.data();
+// }
 
 string decimalToHex(int decimal) {
     std::stringstream stream;

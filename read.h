@@ -6,6 +6,7 @@
 
 using namespace std;
 
+LPCWSTR charToLPCWSTR(const char* charString);
 string decimalToHex(int decimal);
 string convertHexToUTF16(string input);
 int convertHexadecimalToDecimal(string input);

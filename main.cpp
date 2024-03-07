@@ -14,68 +14,33 @@ using namespace std;
 
 int main()
 {
+    string diskName;
+    cout << "Input disk path(C, D, E...): ";
+    getline(cin, diskName);
+    string diskPath = "\\\\.\\" + diskName + ":";
+    cout << diskPath << endl;
+
     BYTE sector[512];
-    readSector("\\\\.\\F:", 0, sector);
+    readSector(diskPath.c_str(), 0, sector);
     BootSector bootSector;
     bootSector.readBootSector(sector);
 
-    FatTable fatTable("\\\\.\\F:", bootSector.getSf(), bootSector.getSb());
+    FatTable fatTable(diskPath.c_str(), bootSector.getSf(), bootSector.getSb());
 
     // đọc RDET
     DWORD startSectorOfRDET = bootSector.getSb() + bootSector.getSf() * bootSector.getNf();
-    cout << startSectorOfRDET;
     vector<vector<string>> entries;
-    readEntireEntries(startSectorOfRDET, entries);
+    readEntireEntries(diskPath.c_str() ,startSectorOfRDET, entries);
     removeFaultyEntry(entries);
     Entries entry;
     entry.input(entries);
-    entry.print();
 
     // build tree
-    Item* root = entry.getRootDirectory(bootSector, fatTable);
-    root->setEntry(entry.getEntries()[0]);
-    
-    cout << "123";
+    Item* root = entry.getRootDirectory(bootSector, fatTable, diskPath.c_str());
     root->print();
+    root->deleteItem();
 
-    // vector<int> list_First_Clusters = entry.getListClusters();
-    
-
-    // vector<vector<DWORD>> list_Sector_Of_Entry;
-    // for(int i = 0; i < list_Clusters_Of_Entry.size(); i++)
-    // {
-    // BYTE* data;
-    // vector<Entry*> e = entry.getEntries();
-
-    // for(int i = 0; i < list_Sector_Of_Entry.size(); i++){
-    //     vector<BYTE> binary_data;
-    //     int size = 0;
-    //     for(int j = 0; j < list_Sector_Of_Entry[i].size() && size < e[i]->getSize(); j++){
-    //         //đọc sdet
-    //         // vector<vector<string>> entries;
-    //         // DWORD startSectorOfSDET = list_Sector_Of_Entry[i][j];
-    //         // readEntireEntries(startSectorOfRDET, entries);
-    //         // removeFaultyEntry(entries);
-    //         // Entries entry;
-    //         // entry.input(entries);
-            
-    //         //đọc file
-    //         data = new BYTE[bootSector.getSc() * 512];
-    //         readSector("\\\\.\\F:", list_Sector_Of_Entry[i][j] * 512, data, bootSector.getSc() * 512);
-    //         for(int t = 0; t < bootSector.getSc() * 512 && size < e[i]->getSize(); t++){
-    //             binary_data.push_back(data[t]);
-    //             size ++;
-    //         }
-    //         delete[] data;
-    //     }
-    //     string content = "";
-    //     for(int i = 0; i < binary_data.size(); i++)
-    //     {
-    //         content += decimalToHex(binary_data[i]) ;
-    //     }
-    //     cout << convertHexToUTF16(content) << endl;
-    // }
-
+    // đọc MFT (không xóa nhưng những dòng dưới)
 
     // BYTE sector[512];
     // readSector(L"\\\\.\\E:", 0, sector);

@@ -45,6 +45,8 @@
         "streambuf": "cpp",
         "typeinfo": "cpp",
         "ios": "cpp",
-        "xstring": "cpp"
-}
+        "xstring": "cpp",
+        "locale": "cpp",
+        "xlocale": "cpp"
+    }
 }

@@ -21,7 +21,7 @@ vector<int> FatTable::getClusters(int firstCluster) {
     vector<int> clusters;
     int currentCluster = firstCluster;
     
-    int eoc_sign[] = {(int)0x00000000, (int)0xFFFFFF0, (int)0xFFFFFFF, (int)0XFFFFFF7, (int)0xFFFFFF8, (int)0xFFFFFFF0};
+    int eoc_sign[] = {(int)0xFFFFFF0, (int)0xFFFFFFF, (int)0XFFFFFF7, (int)0xFFFFFF8, (int)0xFFFFFFF0};
     while (true){
         bool check = false;
         for(int i : eoc_sign)

@@ -1,4 +1,6 @@
 #include "entry.h"
+#include "read.h"
+#include "ATTRIBUTE_LIST.h"
 
 bool checkPrimary(vector<string> entry)
 {
@@ -98,6 +100,17 @@ Entry::Entry()
     attribute = (EntryAttribute)0;
 }
 
+Entry& Entry::operator=(const Entry& entry){
+    this->name = entry.name;
+    this->status = entry.status;
+    this->size = entry.size;
+    this->firstCluster = entry.firstCluster;
+    this->attribute = entry.attribute;
+    this->entries = entry.entries;
+    return *this;
+}
+
+
 void Entry::print()
 {
     for (int i = 0; i < entries.size(); i++)
@@ -137,12 +150,12 @@ void Entry::readEntry(vector<vector<string>> entry)
     this->firstCluster = convertHexadecimalToDecimal(temp);
 }
 
-void readEntireEntries(DWORD startSectorOfRDET, vector<vector<string>> &entries)
+void readEntireEntries(const char* diskPath, DWORD startSectorOfRDET, vector<vector<string>> &entries)
 {
     vector<string> storedValues;
     while (true)
     {
-        readSector(L"\\\\.\\F:", startSectorOfRDET, 512, storedValues);
+        readSector(charToLPCWSTR(diskPath), startSectorOfRDET, 512, storedValues);
         if (checkEmpty(storedValues) || storedValues.empty())
             break;
         for (int i = 0; i < storedValues.size(); i += 32)
@@ -223,8 +236,8 @@ void Entries::print()
 
 Entries::~Entries()
 {
-    for (int i = 0; i < entries.size(); i++)
-        delete entries[i];
+    // for (int i = 0; i < entries.size(); i++)
+    //     delete entries[i];
 }
 
 void Entries::removeEntry(int index){
@@ -232,14 +245,15 @@ void Entries::removeEntry(int index){
     entries.erase(entries.begin() + index);
 }
 
-Item* Entries::getSubDirectory(BootSector bootSector, FatTable fatTable, string name){
+Folder* Entries::getSubDirectory(BootSector bootSector, FatTable fatTable, const char* diskPath, string name){
     entries.erase(entries.begin() + 1);
     entries[0]->setName(name);
-    return getRootDirectory(bootSector, fatTable);
+    return getRootDirectory(bootSector, fatTable, diskPath);
 }
 
-Item* Entry::getFile(BootSector bootSector, FatTable fatTable){
-    return  new File;
+File* Entry::getFile(BootSector bootSector, FatTable fatTable){
+    File* a = new File;
+    return  a;
 }
 
 vector<vector<DWORD>> Entries::getListSector(BootSector bootSector, FatTable fatTable){
@@ -252,7 +266,6 @@ vector<vector<DWORD>> Entries::getListSector(BootSector bootSector, FatTable fat
         vector<DWORD> listSector;
         for(int j = 0; j < list_Clusters_Of_Entry[i].size(); j++){
             DWORD offset = bootSector.getSb() + bootSector.getSf() * bootSector.getNf() + (list_Clusters_Of_Entry[i][j]- 2) * bootSector.getSc();
-            cout << offset << " ";
             listSector.push_back(offset);
         }
         list_Sector_Of_Entry.push_back(listSector);
@@ -261,110 +274,100 @@ vector<vector<DWORD>> Entries::getListSector(BootSector bootSector, FatTable fat
 }
 
 
-Item* Entries::getRootDirectory(BootSector bootSector, FatTable fatTable){
+Folder* Entries::getRootDirectory(BootSector bootSector, FatTable fatTable, const char* diskPath){
     vector<vector<DWORD>> list_Sector = this->getListSector(bootSector, fatTable);
 // đoạn này chừng làm gọn lại là truyền vào list first cluster trả ra vecvtor<vector<int>> 
 // list sector của mỗi cái vector<int> là dãy cluster bắt dầu từ first cluster đó
 
-    Item* res = new Folder;
-        res->setEntry(entries[0]);
+    Folder* res = new Folder;
+    res->setEntry(entries[0]);
+
     for(int i = 1; i < list_Sector.size(); i++){
         Item* item;
-        for(int j = 0; j < list_Sector[i].size() ; j++){
-            //đọc sdet
-            if(entries[i]->getAttribute() == Directory){
+        if(entries[i]->getAttribute() == Directory){
+            for(int j = 0; j < list_Sector[i].size() ; j++){
                 vector<vector<string>> s_entries;
                 DWORD startSectorOfSDET = list_Sector[i][j];
-                readEntireEntries(startSectorOfSDET, s_entries);
+                readEntireEntries(diskPath, startSectorOfSDET, s_entries);
                 removeFaultyEntry(s_entries);
                 Entries entry;
                 entry.input(s_entries); 
-
-                item = entry.getSubDirectory(bootSector, fatTable, entries[i]->getName());
-                item->print();
-            } else if(entries[i]->getAttribute() == Archive){
-                item = entries[i]->getFile(bootSector, fatTable);
-                item->print();
-                cout << "22";
+    
+                item = entry.getSubDirectory(bootSector, fatTable, diskPath, entries[i]->getName());
             }
+        } else if(entries[i]->getAttribute() == Archive){
+            File* f = entries[i]->getFile(bootSector, fatTable);
+            vector<BYTE> binary_data;
+            for(int j = 0; j < list_Sector[i].size() ; j++){
+                int size = 0;
+                BYTE* data = new BYTE[bootSector.getSc() * 512];
+                readSector("\\\\.\\F:", list_Sector[i][j] * 512, data, bootSector.getSc() * 512);
+                for(int t = 0; t < bootSector.getSc() * 512 && size < entries[i]->getSize(); t++){
+                    binary_data.push_back(data[t]);
+                    size ++;
+                }
+                delete[] data;
+            }
+            string content = "";
+            for(int i = 0; i < binary_data.size(); i++)
+            {
+                content += decimalToHex(binary_data[i]) ;
+            }
+            f->setData(convertHexToUTF16(content));
+            item = f;
+            item->setEntry(entries[i]);
+            
         }
         res->addItem(item);
     }
-
-    // Item* res = new Folder;
-    // BYTE* data;
-    // for(int i = 0; i < list_Sector.size(); i++){
-    //     vector<BYTE> binary_data;
-    //     int size = 0;
-    //     for(int j = 0; j < list_Sector[i].size() ; j++){
-    //         //đọc sdet
-    //         if(entries[i]->getAttribute() == Directory){
-    //             vector<vector<string>> s_entries;
-    //             DWORD startSectorOfSDET = list_Sector[i][j];
-    //             readEntireEntries(startSectorOfSDET, s_entries);
-    //             removeFaultyEntry(s_entries);
-    //             Entries entry;
-    //             entry.input(s_entries);    
-
-    //             cout << "phihoang" << endl;
-    //             Item* item = entry.getSubDirectory(bootSector, fatTable);
-    //             cout << "minhhoang" << endl;
-    //             item->setEntry(entries[i]);
-    //             res->addItem(item);
-
-    //         } else if(entries[i]->getAttribute() == Archive){
-    //             Item* item = entries[i]->getFile(bootSector, fatTable);
-                
-    //             item->setEntry(entries[i]);
-    //             res->addItem(item);
-    //             cout << "thanhdat";
-    //             // data = new BYTE[bootSector.getSc() * 512];
-    //             // readSector("\\\\.\\F:", list_Sector_Of_Entry[i][j] * 512, data, bootSector.getSc() * 512);
-    //             // for(int t = 0; t < bootSector.getSc() * 512 && size < entries[i]->getSize(); t++){
-    //             //     binary_data.push_back(data[t]);
-    //             //     size ++;
-    //             // }
-    //             // delete[] data;
-    //         }
-            
-    //     }
-        // string content = "";
-        // for(int i = 0; i < binary_data.size(); i++)
-        // {
-        //     content += decimalToHex(binary_data[i]) ;
-        // }
-        // cout << convertHexToUTF16(content) << endl;
-    // }
     return res;
 }
 
-void Item::setEntry(Entry* &entry){
+void Item::setEntry(Entry* entry){
+    this->entry = new Entry;
     this->entry = entry;
-    this->entry->printEntry();
 }
 
 
 Folder::Folder(){}
 
+void Folder::print(int level){
+    Item::print(level);
 
-
-
-void Folder::print(){
-    Item::print();
-    for(Item* i : subfolder)
-        i->print();
+    for(int i = 0; i < subfolder.size(); i++)
+        subfolder[i]->print(level + 1);
 }
 
-vector<Item*> Folder::getSubFolder(){
-    return subfolder;
+void File::print(int level){
+    Item::print(level);
+    for(int i = 0; i < level; i++)
+        cout << "  ";
+    cout << "content: ";
+    if(data != "")
+        cout <<data;
+    else
+        cout << "Khong co gi het nha:))";
+    cout << endl << endl;
 }
+
 
 void Folder::addItem(Item* item){
-    for(Item* i : item->getSubFolder()){
-        this->subfolder.push_back(i);
-    }
+    this->subfolder.push_back(item);
 }
 
-void Item::print(){
-    cout << entry->getName() << " ";
+void Folder::deleteItem(){
+    for(int i = 0; i < subfolder.size(); i++)
+        subfolder[i]->deleteItem();
+    Item::deleteItem();
+}
+
+void Item::deleteItem(){
+    delete entry;
+}
+
+
+void Item::print(int level){
+    for(int i = 0; i < level; i++)
+        cout << "  ";
+    cout << entry->getName() << endl << endl;
 }

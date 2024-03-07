@@ -148,20 +148,3 @@ string hexToString(string hex)
     }
     return result;
 }
-
-LPCWSTR charToLPCWSTR(const char* charString)
-{
-    int size = MultiByteToWideChar(CP_UTF8, 0, charString, -1, nullptr, 0);
-    if (size == 0) {
-        cerr << "Failed to get required buffer size. Error code: " << GetLastError() << std::endl;
-        return nullptr;
-    }
-
-    vector<wchar_t> buffer(size);
-    if (MultiByteToWideChar(CP_UTF8, 0, charString, -1, buffer.data(), size) == 0) {
-        cerr << "Failed to convert string. Error code: " << GetLastError() << std::endl;
-        return nullptr;
-    }
-
-    return buffer.data();
-}

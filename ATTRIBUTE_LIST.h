@@ -48,4 +48,3 @@ public:
 
 DWORD hexToDec(string hex);
 string hexToString(string hex);
-LPCWSTR charToLPCWSTR(const char* charString);

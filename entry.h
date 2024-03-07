@@ -22,13 +22,15 @@ enum EntryAttribute {
 
 bool checkEmpty(vector<string> entry);
 bool checkPrimary(vector<string> entry);
-void readEntireEntries(DWORD startSectorOfRDET, vector<vector<string>> &entries);
+void readEntireEntries(const char* diskPath, DWORD startSectorOfRDET, vector<vector<string>> &entries);
 vector<vector<string>> extractEntry(vector<vector<string>> &entries);
 void removeFaultyEntry(vector<vector<string>> &entries);
 string convertStringToLittleEdian(string input);
 string getStringFromVector(vector<string> storedValues, int start, int length);
 
 class Item;
+class File;
+class Folder;
 
 class Entry
 {
@@ -41,6 +43,7 @@ private:
     vector<vector<string>> entries;
 public:
     Entry();
+    Entry& operator=(const Entry& entry);
     void readEntry(vector<vector<string>> entry);
     void printEntry();
     void print();
@@ -52,37 +55,33 @@ public:
     void setName(string name) { this->name = name; }
     friend string getFullNameFromASetOfEntry(vector<vector<string>> entry);
     friend string getNameFromSecondaryEntry(vector<string> entry);
-    Item* getFile(BootSector bootSector, FatTable fatTable);
+    File* getFile(BootSector bootSector, FatTable fatTable);
 };
 
 class Item{
     Entry *entry;
 public:
-    void setEntry(Entry*& entry);
-    void virtual addItem(Item* item) = 0;
-    void virtual print();
-    vector<Item*> virtual getSubFolder(){};
+    void setEntry(Entry* entry);
+    void virtual print(int level = 0);
+    vector<Item*> virtual getSubfolder(){}
+    void virtual deleteItem();
 };
 
 class Folder : public Item{
     vector<Item*> subfolder;
 public:
     Folder();
-    vector<Item*> getSubFolder();
     void addItem(Item* item);
-    void print() override;
+    vector<Item*> getSubfolder() { return subfolder; }
+    void print(int level = 0);
+    void deleteItem();
 };
 
 class File : public Item{
     string data;
 public:
-    // File() : Item (){}
-    void addItem(Item* item) {}
-    vector<Item*> getSubFolder() {
-        vector<Item*> a;
-        return a;
-    }
-
+    void setData(string data){ this->data = data; }
+    void print(int level = 0);
 };
 
 class Entries
@@ -98,8 +97,8 @@ public:
     WORD getNRDET() { return entries.size(); }
     vector<Entry*> getEntries() {return entries;}
     ~Entries();
-    Item* getRootDirectory(BootSector bootSector, FatTable fatTable);  
-    Item* getSubDirectory(BootSector bootSector, FatTable fatTable, string name);
+    Folder* getRootDirectory(BootSector bootSector, FatTable fatTable, const char* diskPath);  
+    Folder* getSubDirectory(BootSector bootSector, FatTable fatTable, const char* diskPath, string name);
 
     void removeEntry(int index); 
 };
