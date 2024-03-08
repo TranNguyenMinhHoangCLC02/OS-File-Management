@@ -31,7 +31,7 @@ public:
         this->fileName = "";
     }
     FileName(vector<string> entry, BPB bpb, const char *diskPath);
-    void print();
+    void printInfo();
     string getFileName();
     int getSizeAttribute();
     int getSizeEntireAttribute();

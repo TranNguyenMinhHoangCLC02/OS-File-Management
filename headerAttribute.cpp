@@ -17,8 +17,8 @@ void NTFSAttributeHeader::printInfo()
     cout << "Type ID: " << this->typeID << endl;
     cout << "Attribute Size: " << this->attributeSize << endl;
     cout << "Flag Non Resident: " << this->flagNonResident << endl;
-    cout << "Length Attribute: " << this->lengthAttribute << endl;
-    cout << "Position of Attribute: " << this->positionOfAttribute << endl;
+    cout << "Length Attribute Name: " << this->lengthAttribute << endl;
+    cout << "Position of Attribute Name: " << this->positionOfAttribute << endl;
     cout << "Flag: " << this->flag << endl;
     cout << "Attribute ID: " << this->AttributeID << endl;
     system("pause");

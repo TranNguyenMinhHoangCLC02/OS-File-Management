@@ -28,7 +28,6 @@ int main()
     cout << "Input disk path(C, D, E...): ";
     getline(cin, diskName);
     string diskPath = "\\\\.\\" + diskName + ":";
-    cout << diskPath << endl;
 
     if (fileSystem == "FAT32") {
         BYTE sector[512];
@@ -54,15 +53,13 @@ int main()
 
     else {
         BPB bpb(charToLPCWSTR(diskPath.c_str()));
-        bpb.printBPBInfo();
         bpb.printBPB();
+        bpb.printBPBInfo();
         int MFTStart = bpb.startingClusterOfMFT();
         int Sc = bpb.getSc();
         vector<vector<string>> entries;
-        // read_MFT(MFTStart, Sc, disk, entries);
 
         vector<string> MFT;
-        // read_MFT2(MFTStart, Sc, entries);
         readSector(charToLPCWSTR(diskPath.c_str()), MFTStart * Sc, 1024, MFT);
         for (int i = 0; i < MFT.size(); i++)
         {
@@ -75,66 +72,52 @@ int main()
         vector<string> temp = MFT;
         int offsetToAttribute = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(temp, 0x14, 0x15 - 0x14 + 1)));
         temp.erase(temp.begin(), temp.begin() + offsetToAttribute);
-        for (int i = 0; i < temp.size(); i++)
+        // for (int i = 0; i < temp.size(); i++)
+        // {
+        //     if (i % 16 == 0)
+        //         cout << "\n";
+        //     cout << temp[i] << " ";
+        // }
+        // cout << "\n";
+        StandardInfo itemInfo(temp);
+        // itemInfo.printInfo();
+        temp.erase(temp.begin(), temp.begin() + itemInfo.getSize());
+        // for (int i = 0; i < temp.size(); i++)
+        // {
+        //     if (i % 16 == 0)
+        //         cout << "\n";
+        //     cout << temp[i] << " ";
+        // }
+        FileName fileName(temp, bpb, diskPath.c_str());
+        // fileName.printInfo();
+        temp.erase(temp.begin(), temp.begin() + fileName.getSizeAttribute());
+        // for (int i = 0; i < temp.size(); i++)
+        // {
+        //     if (i % 16 == 0)
+        //         cout << "\n";
+        //     cout << temp[i] << " ";
+        // }
+        // cout << "\n";
+        vector<string> nextEntry;
+        readSector(charToLPCWSTR(diskPath.c_str()), MFTStart * Sc + 2, 1024, nextEntry);
+        vector<string> temp2 = nextEntry;
+        for (int i = 0; i < temp2.size(); i++)
         {
             if (i % 16 == 0)
                 cout << "\n";
-            cout << temp[i] << " ";
+            cout << temp2[i] << " ";
         }
         cout << "\n";
-        while (temp.empty() == false)
-        {
-            vector<string> temp2;
-            for (int i = 0; i < 16; i++)
-            {
-                temp2.push_back(temp[i]);
-            }
-            NTFSAttributeHeader header(temp2);
-            if (MFTSize == MFTSize + header.getAttributeSize())
-                break;
-            MFTSize += header.getAttributeSize();
-            cout << "current size: " << MFTSize << "\n";
-            temp.erase(temp.begin(), temp.begin() + header.getAttributeSize());
-        }
-        cout << "MFT Size: " << MFTSize << endl;
-        MFTStart++;
-        // for (unsigned long long i = MFTStart * Sc; i < MFTStart * Sc + MFTSize; i += 1)
-        // {
-        //     vector<string> temp;
-        //     readSector(charToLPCWSTR(diskPath.c_str()), i, 1024, temp);
-        //     // entries.push_back(temp);
-        //     for (int i = 0; i < temp.size(); i++)
-        //     {
-        //         if (i % 16 == 0)
-        //             cout << "\n";
-        //         cout << temp[i] << " ";
-        //     }
-        //     processMFTEntry(temp, bpb, diskPath);
-        //     break;
-        // }
-        // for (int i = 0; i < entries.size(); i++)
-        // {
-        //     for (int j = 0; j < entries[i].size(); j++)
-        //     {
-        //         if (j % 16 == 0)
-        //             cout << "\n";
-        //         cout << entries[i][j] << " ";
-        //     }
-        //     cout << "\n";
-        //     cout << "\n";
-        // }
-        vector<string> temp1;
-        readSector(charToLPCWSTR(diskPath.c_str()), MFTStart * Sc + 1, 1024, temp1);
-        // processMFTEntry(temp1, bpb, diskPath);
-        NTFSAttributeHeader header(temp1);
-        temp1.erase(temp1.begin(), temp1.begin() + 56);
-        header.printInfo();
-        for (int i = 0; i < temp1.size(); i++)
+        int offsetToAttribute2 = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(temp2, 0x14, 0x15 - 0x14 + 1)));
+        temp2.erase(temp2.begin(), temp2.begin() + offsetToAttribute2);
+        // cout << nextEntry.size() << endl;
+        for (int i = 0; i < temp2.size(); i++)
         {
             if (i % 16 == 0)
                 cout << "\n";
-            cout << temp1[i] << " ";
+            cout << temp2[i] << " ";
         }
+        cout << "\n";
     }
 
     // đọc MFT (không xóa nhưng những dòng dưới)

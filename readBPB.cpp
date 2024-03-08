@@ -3,7 +3,7 @@
 int BPB::findNTFSIdentifier()
 {
     for (int i = 0; i < storedValues.size() - 4; i++)
-        if (storedValues[i] == "80" && storedValues[i + 1] == "00" && storedValues[i + 2] == "80" && storedValues[i+3] == "00")
+        if (storedValues[i] == "80" && storedValues[i + 1] == "00")
             return i;
     return -1;
 }
@@ -56,7 +56,6 @@ int BPB::getBeginningSectorOfLogicalPartition()
     string temp = "";
     for (int i = 3; i >= 0; i--)
         temp += storedValues[current + i];
-    cout << temp << endl;
     return convertHexadecimalToDecimal(temp);
 }
 
@@ -97,14 +96,14 @@ void readBPB(LPCWSTR diskPath, vector<string> &storedValues)
 
 void BPB::printBPBInfo()
 {
-    cout << "Sector size = " << getSectorSize() << endl;
-    cout << "Sc = " << getSc() << endl;
-    cout << "st = " << getst() << endl;
-    cout << "h = " << getHeadNumber() << endl;
-    cout << "Beginning sector of logical partition = " << getBeginningSectorOfLogicalPartition() << endl;
-    cout << "Sv = " << getSv() << endl;
-    cout << "Starting cluster of MFT = " << startingClusterOfMFT() << endl;
-    cout << "Size of a MFT entry = " << getSizeOfAMFTEntry() << endl;
+    cout << "Sector size = " << this->getSectorSize() << endl;
+    cout << "Sc = " << this->getSc() << endl;
+    cout << "st = " << this->getst() << endl;
+    cout << "h = " << this->getHeadNumber() << endl;
+    cout << "Beginning sector of logical partition = " << this->getBeginningSectorOfLogicalPartition() << endl;
+    cout << "Sv = " << this->getSv() << endl;
+    cout << "Starting cluster of MFT = " << this->startingClusterOfMFT() << endl;
+    cout << "Size of a MFT entry = " << this->getSizeOfAMFTEntry() << endl;
 }
 
 void BPB::printBPB()

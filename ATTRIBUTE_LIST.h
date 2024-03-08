@@ -44,6 +44,7 @@ public:
     void printInfo(); // print the converted data
     NTFSAttributeHeader getHeader();
     vector<attributeRecord> getRecords();
+    int getAttributeSize() { return this->header.getAttributeSize(); }
 };
 
 DWORD hexToDec(string hex);
