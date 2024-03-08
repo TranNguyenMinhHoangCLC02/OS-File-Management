@@ -47,6 +47,7 @@
         "ios": "cpp",
         "xstring": "cpp",
         "locale": "cpp",
-        "xlocale": "cpp"
+        "xlocale": "cpp",
+        "xutility": "cpp"
     }
 }

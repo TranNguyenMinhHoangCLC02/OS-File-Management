@@ -21,12 +21,7 @@ void NTFSAttributeHeader::printInfo()
     cout << "Position of Attribute: " << this->positionOfAttribute << endl;
     cout << "Flag: " << this->flag << endl;
     cout << "Attribute ID: " << this->AttributeID << endl;
-}
-
-void NTFSAttributeHeader::print()
-{
-    for (int i = 0; i < this->header.size(); i++)
-        cout << this->header[i];
+    system("pause");
 }
 
 int NTFSAttributeHeader::getTypeID()

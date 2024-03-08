@@ -1,10 +1,9 @@
-#include "MFT.h"
 #include "headerAttribute.h"
 #include "read.h"
 #include "ATTRIBUTE_LIST.h"
 #pragma once
 
-class $DATA
+class DATA
 {
 private:
     int dataSize;
@@ -12,9 +11,10 @@ private:
     NTFSAttributeHeader header;
     vector<BYTE> data;
 public:
-    $DATA(const char* diskPath, vector<string> entry, BPB bpb, long long offset);
+    DATA(const char* diskPath, vector<string> entry, BPB bpb, long long offset);
     void print();
     void printInfo();
     NTFSAttributeHeader getHeader();
     vector<BYTE> getData();
+    int getDataSize(){ return header.getAttributeSize(); }
 };

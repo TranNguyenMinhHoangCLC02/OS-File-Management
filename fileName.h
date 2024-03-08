@@ -1,17 +1,11 @@
 #include "read.h"
-#include "MFT.h"
 #include "BPB.h"
 #include "entry.h"
 #include "headerAttribute.h"
 #include "ATTRIBUTE_LIST.h"
+#pragma once
 
-vector<string> extractHeader(vector<string> entry)
-{
-    vector<string> header;
-    for (int i = 0; i < 16; i++)
-        header.push_back(entry[i]);
-    return header;
-}
+vector<string> extractHeader(vector<string> entry);
 
 class FileName
 {

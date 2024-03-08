@@ -1,6 +1,6 @@
 #include "DATA.h"
 
-$DATA::$DATA(const char *diskpath, vector<string> entry, BPB bpb, long long offset)
+DATA::DATA(const char *diskpath, vector<string> entry, BPB bpb, long long offset)
 {
     vector<string> headerArr;
     for (int i = 0; i < 16; i++)
@@ -58,7 +58,7 @@ $DATA::$DATA(const char *diskpath, vector<string> entry, BPB bpb, long long offs
     }
 }
 
-void $DATA::print()
+void DATA::print()
 {
     header.printInfo();
     cout << "Data Size: " << this->dataSize << endl;
@@ -69,7 +69,7 @@ void $DATA::print()
     }
 }
 
-void $DATA::printInfo()
+void DATA::printInfo()
 {
     header.printInfo();
     cout << "Data Size: " << this->dataSize << endl;
@@ -80,12 +80,12 @@ void $DATA::printInfo()
     }
 }
 
-NTFSAttributeHeader $DATA::getHeader()
+NTFSAttributeHeader DATA::getHeader()
 {
     return this->header;
 }
 
-vector<BYTE> $DATA::getData()
+vector<BYTE> DATA::getData()
 {
     return this->data;
 }

@@ -2,8 +2,9 @@
 #include "bootSector.h"
 // #include "fat32.h"
 #include "entry.h"
+#pragma once
 
-class File
+class File1
 {
 private:
     BootSector bootSector;
@@ -12,6 +13,6 @@ private:
     string content;
     const char* diskPath;
 public:
-    File(const char* diskPath);
+    File1(const char* diskPath);
     void printContent();
 };

@@ -25,7 +25,6 @@ public:
         this->AttributeID = 0;
     }
     NTFSAttributeHeader(vector<string> header);
-    void print();
     void printInfo();
     int getTypeID();
     int getAttributeSize();

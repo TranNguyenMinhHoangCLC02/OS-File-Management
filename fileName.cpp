@@ -51,6 +51,15 @@ FileName::FileName(vector<string> entry, BPB bpb, const char *diskPath)
         }
         
     }
+
+vector<string> extractHeader(vector<string> entry)
+{
+    vector<string> header;
+    for (int i = 0; i < 16; i++)
+        header.push_back(entry[i]);
+    return header;
+}
+
 void FileName::print()
 {
     cout << "File Name: " << this->fileName << endl;
