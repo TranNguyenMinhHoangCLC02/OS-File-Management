@@ -16,7 +16,6 @@ FatTable& FatTable::operator= (const FatTable &fatTable){
         return *this;
 }
 
-
 vector<int> FatTable::getClusters(int firstCluster) {
     vector<int> clusters;
     int currentCluster = firstCluster;
