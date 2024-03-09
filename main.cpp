@@ -182,7 +182,6 @@ int main()
         while (true)
         {
             readSector(charToLPCWSTR(diskPath.c_str()), (MFTStart * Sc + count), 1024, MFT);
-            cout << "\n";
             int countZero = 0;
             for (int i = 0; i < MFT.size(); i++)
             {
@@ -198,18 +197,11 @@ int main()
         for (int i = 0; i < entries.size(); i++)
         {
             vector<string> temp = entries[i];
-            for (int j = 0; j < temp.size(); j++)
-            {
-                if (j % 16 == 0)
-                    cout << "\n";
-                cout << temp[j] << " ";
-            }
-            cout << "\n";
             int offsetToAttribute = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(temp, 0x14, 0x15 - 0x14 + 1)));
             temp.erase(temp.begin(), temp.begin() + offsetToAttribute);
             while (temp.empty() == false)
             {
-                if (temp[0] == "FF" && temp[1] == "FF")
+                if ((temp[0] == "FF" && temp[1] == "FF"))
                     break;
                 NTFSAttributeHeader header(temp);
                 if (header.getTypeID() != 0x10 && header.getTypeID() != 0x30 && header.getTypeID() != 0x80 && header.getTypeID() != 0x90)
@@ -221,38 +213,23 @@ int main()
                     StandardInfo itemInfo(temp);
                     itemInfo.printInfo();
                     temp.erase(temp.begin(), temp.begin() + itemInfo.getSize());
-                    for (int i = 0; i < temp.size(); i++)
-                    {
-                        if (i % 16 == 0)
-                            cout << "\n";
-                        cout << temp[i] << " ";
-                    }
-                    cout << "\n";
                 }
                 else if (header.getTypeID() == 0x30)
                 {
                     FileName fileName(temp, bpb, diskPath.c_str());
                     fileName.printInfo();
                     temp.erase(temp.begin(), temp.begin() + fileName.getSizeEntireAttribute());
-                    for (int i = 0; i < temp.size(); i++)
-                    {
-                        if (i % 16 == 0)
-                            cout << "\n";
-                        cout << temp[i] << " ";
-                    }
-                    cout << "\n";
                 }
                 else if (header.getTypeID() == 0x80)
                 {
                     // DATA data(diskPath.c_str(), temp, bpb, 0);
                     // data.print();
-                    NTFSAttributeHeader header2(temp);
-                    MFT.erase(MFT.begin(), MFT.begin() + header2.getAttributeSize());
+                    MFT.erase(MFT.begin(), MFT.begin() + header.getAttributeSize());
+                    break;
                 }
                 else if (header.getTypeID() == 0x90)
                 {
-                    NTFSAttributeHeader header2(temp);
-                    temp.erase(temp.begin(), temp.begin() + header2.getAttributeSize());
+                    temp.erase(temp.begin(), temp.begin() + header.getAttributeSize());
                 }
             }
         }
