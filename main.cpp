@@ -222,9 +222,9 @@ int main()
                 }
                 else if (header.getTypeID() == 0x80)
                 {
-                    // DATA data(diskPath.c_str(), temp, bpb, 0);
+                    DATA data(diskPath.c_str(), temp, bpb, 0);
                     // data.print();
-                    MFT.erase(MFT.begin(), MFT.begin() + header.getAttributeSize());
+                    MFT.erase(MFT.begin(), MFT.begin() + data.getDataSize());
                     break;
                 }
                 else if (header.getTypeID() == 0x90)
