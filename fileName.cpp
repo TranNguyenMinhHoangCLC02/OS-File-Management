@@ -11,7 +11,7 @@ FileName::FileName(vector<string> entry, BPB bpb, const char *diskPath)
             this->offset = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->entry, 20, 21 - 20 + 1)));
             this->lengthFileName = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->entry, this->offset + 64, 1)));
             this->nameSpace = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->entry, this->offset + 65, 1)));
-            this->fileName = convertHexToUTF16(getStringFromVector(this->entry, this->offset + 66, this->lengthFileName + 4));
+            this->fileName = convertHexToUTF16(getStringFromVector(this->entry, this->offset + 66, this->lengthFileName * 2));
         }
         else
         {
