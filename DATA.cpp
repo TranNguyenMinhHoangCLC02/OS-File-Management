@@ -8,20 +8,21 @@ DATA::DATA(const char *diskpath, vector<string> entry, BPB bpb, long long offset
         headerArr.push_back(entry[i + offset]);
     }
     header = NTFSAttributeHeader(headerArr);
-    this->dataSize = convertHexadecimalToDecimal(entry[16 + offset] + entry[17 + offset] + entry[18 + offset] + entry[19 + offset]);
-    this->dataOffset = convertHexadecimalToDecimal(entry[20 + offset] + entry[21 + offset]);
-    if (!header.getFlagNonResident())
+    this->dataSize = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(entry, 16 + offset, 19 - 16 + 1)));
+    this->dataOffset = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(entry, 20 + offset, 21 - 20 + 1)));
+    if (header.getFlagNonResident()  == 0)
     {
-        for (int i = 0; i < data.size(); i++)
+        for (int i = 0; i < this->dataSize; i++)
         {
-            data.push_back(convertHexadecimalToDecimal(entry[i + this->dataOffset + offset]));
+            data.push_back(convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(entry, dataOffset + i, 1))));
+            cout << data[i] << " ";
         }
     }
     else
     {
         // get data runs of non-resident attribute
         int current = offset + 32; // offset to run list at byte 32 - 33 from start of attribute
-        WORD offsetToRunList = convertHexadecimalToDecimal(entry[current] + entry[current + 1]);
+        WORD offsetToRunList = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(entry, current, 2)));
         current = offset + offsetToRunList;
         vector<dataRun> runs;
         while (entry[current] != "00" && entry[current + 1] != "00")
@@ -58,26 +59,17 @@ DATA::DATA(const char *diskpath, vector<string> entry, BPB bpb, long long offset
     }
 }
 
-void DATA::print()
-{
-    header.printInfo();
-    cout << "Data Size: " << this->dataSize << endl;
-    cout << "Data Offset: " << this->dataOffset << endl;
-    for (int i = 0; i < this->data.size(); i++)
-    {
-        cout << this->data[i];
-    }
-}
-
 void DATA::printInfo()
 {
     header.printInfo();
     cout << "Data Size: " << this->dataSize << endl;
     cout << "Data Offset: " << this->dataOffset << endl;
+    cout << "Data: \n";
     for(int i = 0; i < this->data.size(); i++)
     {
-        cout << (char)this->data[i] << " ";
+        cout << this->data[i];
     }
+    cout << endl;
 }
 
 NTFSAttributeHeader DATA::getHeader()

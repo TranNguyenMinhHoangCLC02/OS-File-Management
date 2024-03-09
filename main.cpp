@@ -197,6 +197,13 @@ int main()
         for (int i = 0; i < entries.size(); i++)
         {
             vector<string> temp = entries[i];
+            for (int j = 0; j < temp.size(); j++)
+            {
+                if (j % 16 == 0)
+                    cout << "\n";
+                cout << temp[j] << " ";
+            }
+            cout << "\n";
             int offsetToAttribute = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(temp, 0x14, 0x15 - 0x14 + 1)));
             temp.erase(temp.begin(), temp.begin() + offsetToAttribute);
             while (temp.empty() == false)
@@ -223,7 +230,7 @@ int main()
                 else if (header.getTypeID() == 0x80)
                 {
                     DATA data(diskPath.c_str(), temp, bpb, 0);
-                    // data.print();
+                    data.printInfo();
                     MFT.erase(MFT.begin(), MFT.begin() + data.getDataSize());
                     break;
                 }
