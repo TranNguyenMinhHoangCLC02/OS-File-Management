@@ -10,6 +10,7 @@
 #include "BPB.h"
 #include "MFT.h"
 #include "DATA.h"
+#include "indexRoot.h"
 using namespace std;
 
 int main()
@@ -197,13 +198,6 @@ int main()
         for (int i = 0; i < entries.size(); i++)
         {
             vector<string> temp = entries[i];
-            for (int j = 0; j < temp.size(); j++)
-            {
-                if (j % 16 == 0)
-                    cout << "\n";
-                cout << temp[j] << " ";
-            }
-            cout << "\n";
             int offsetToAttribute = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(temp, 0x14, 0x15 - 0x14 + 1)));
             temp.erase(temp.begin(), temp.begin() + offsetToAttribute);
             while (temp.empty() == false)
@@ -236,6 +230,7 @@ int main()
                 }
                 else if (header.getTypeID() == 0x90)
                 {
+                    // indexRoot indexRoot(temp, bpb, diskPath.c_str());
                     temp.erase(temp.begin(), temp.begin() + header.getAttributeSize());
                 }
             }

@@ -50,7 +50,7 @@ DATA::DATA(const char *diskpath, vector<string> entry, BPB bpb, long long offset
 
 void DATA::printInfo()
 {
-    header.printInfo();
+    // header.printInfo();
     cout << "Data Size: " << this->dataSize << endl;
     cout << "Data Offset: " << this->dataOffset << endl;
     cout << "Data: \n";

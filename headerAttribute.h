@@ -6,7 +6,7 @@ class NTFSAttributeHeader
 {
 private:
     vector<string> header;
-    int typeID;
+    unsigned long long typeID;
     int attributeSize;
     int flagNonResident;
     int lengthAttribute;
