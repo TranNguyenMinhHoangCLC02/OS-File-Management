@@ -34,8 +34,6 @@ private:
 
     //converted data
     NTFSAttributeHeader header;
-        // lengthAttribute: length of the name of this attribute
-        // positionOfAttribute: staring offset of the name of this attribute
     vector<attributeRecord> records;
     vector<dataRun> runlist; // list of data runs in case of non-resident flag
 public:
