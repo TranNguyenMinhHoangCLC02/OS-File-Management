@@ -30,7 +30,7 @@ $ATTRIBUTE_LIST::$ATTRIBUTE_LIST(vector<string> entry, DWORD offset, const char 
             item.startingVCN = hexToDec(convertStringToLittleEdian(getStringFromVector(entry, current + 8, 8)));
             item.fileReference = hexToDec(convertStringToLittleEdian(getStringFromVector(entry, current + 16, 8)));
             item.attributeID = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(entry, current + 24, 2)));
-            item.name = hexToString(convertStringToLittleEdian(getStringFromVector(entry, current + item.offsetToName, item.nameLength)));
+            item.name = hexToString(convertStringToLittleEdian(getStringFromVector(entry, current + item.offsetToName, item.nameLength * 2)));
             item.data = vector<string>(entry.begin() + current, entry.begin() + current + item.recordLength);
             this->records.push_back(item);
             current += item.recordLength;
@@ -86,7 +86,7 @@ $ATTRIBUTE_LIST::$ATTRIBUTE_LIST(vector<string> entry, DWORD offset, const char 
             item.startingVCN = hexToDec(convertStringToLittleEdian(getStringFromVector(clusterData, current + 8, 8)));
             item.fileReference = hexToDec(convertStringToLittleEdian(getStringFromVector(clusterData, current + 16, 8)));
             item.attributeID = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(clusterData, current + 24, 2)));
-            item.name = hexToString(convertStringToLittleEdian(getStringFromVector(clusterData, current + item.offsetToName, item.nameLength)));
+            item.name = hexToString(convertStringToLittleEdian(getStringFromVector(clusterData, current + item.offsetToName, item.nameLength * 2)));
             item.data = vector<string>(clusterData.begin() + current, clusterData.begin() + current + item.recordLength);
             this->records.push_back(item);
             current += item.recordLength;
