@@ -21,11 +21,11 @@ DATA::DATA(const char *diskpath, vector<string> entry, BPB bpb, long long offset
     else
     {
         // get data runs of non-resident attribute
-        int current = offset + 32; // offset to run list at byte 32 - 33 from start of attribute
+        int current = offset + 0x20; // offset to run list at byte 32 - 33 from start of attribute
         WORD offsetToRunList = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(entry, current, 2)));
-        current = offset + offsetToRunList;
-        vector<dataRun> runs;
-        while (entry[current] != "00" && entry[current + 1] != "00")
+        current = offsetToRunList;
+        vector<string> data;
+        while (true)
         {
             dataRun run;
             string firstByte = entry[current];
@@ -33,28 +33,17 @@ DATA::DATA(const char *diskpath, vector<string> entry, BPB bpb, long long offset
             int bytesToParseCount = stoi(firstByte.substr(1, 1));
             if (bytesToParseNum == 0)
                 break;
-            string runLength = "";
-            for (int i = 0; i < bytesToParseNum; i++)
-                runLength += entry[current + i];
-            run.clusterCount = convertHexadecimalToDecimal(runLength);
-            string runOffset = "";
-            for (int i = 0; i < bytesToParseCount; i++)
-                runOffset += entry[current + bytesToParseNum + i];
-            run.clusterNumber = convertHexadecimalToDecimal(runOffset);
-            runs.push_back(run);
-            current += bytesToParseNum + bytesToParseCount;
-        }
-
-        // read cluster from the data run cluster number by the total cluster count
-        for (int i = 0; i < runs.size(); i++)
-        {
-            vector<string> cluster;
-            readClusters(charToLPCWSTR(diskpath), runs[i].clusterNumber, bpb.getSc(),
-                         runs[i].clusterCount * bpb.getSc() * bpb.getSectorSize(), cluster);
-            for (int j = 0; j < cluster.size(); j++)
+            int clusterRun = convertHexadecimalToDecimal(entry[current + 1]);
+            current += 2;
+            int clusterRunStr = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(entry, current, bytesToParseNum)));
+            for (int i = 0; i < clusterRun * bpb.getSc(); i++)
             {
-                data.push_back(convertHexadecimalToDecimal(cluster[j]));
+                readSector(charToLPCWSTR(diskpath), clusterRunStr * bpb.getSc() + i, 512, data);
             }
+            string realData = convertHexToUTF16(getStringFromVector(data, 0, data.size()));
+            for (int i = 0; i < realData.size(); i++)
+                this->data.push_back(realData[i]);
+            current += bytesToParseCount;
         }
     }
 }

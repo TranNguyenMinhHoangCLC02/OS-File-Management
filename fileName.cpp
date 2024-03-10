@@ -4,7 +4,6 @@ FileName::FileName(vector<string> entry, BPB bpb, const char *diskPath)
     {
         this->header = NTFSAttributeHeader(extractHeader(entry));
         this->entry = entry;
-        this->runlist = {};
         if (this->header.getFlagNonResident() == 0)
         {
             this->sizeAttribute = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->entry, 16, 19 - 16 + 1)));
@@ -15,41 +14,31 @@ FileName::FileName(vector<string> entry, BPB bpb, const char *diskPath)
         }
         else
         {
-            int current = 0x20;
-            WORD offsetToRunList = hexToDec(convertStringToLittleEdian(getStringFromVector(this->entry, current, 2)));
-            current = offsetToRunList;
-            while ((this->entry[current] != "00" && this->entry[current + 1] != "00") && current < this->entry.size())
+            this->sizeAttribute = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->entry, 16, 19 - 16 + 1)));
+            this->offset = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->entry, 20, 21 - 20 + 1)));
+            int current = this->offset;
+            vector<string> data;
+            while (true)
             {
                 dataRun run;
-                string firstByte = this->entry[current];
+                string firstByte = entry[current];
                 int bytesToParseNum = stoi(firstByte.substr(0, 1));
                 int bytesToParseCount = stoi(firstByte.substr(1, 1));
                 if (bytesToParseNum == 0)
                     break;
-                string runLength = "";
-                for (int i = 0; i < bytesToParseNum; i++)
-                    runLength += this->entry[current + i];
-                run.clusterCount = hexToDec(convertStringToLittleEdian(runLength));
-                string runOffset = "";
-                for (int i = 0; i < bytesToParseCount; i++)
-                    runOffset += this->entry[current + bytesToParseNum + i];
-                run.clusterNumber = hexToDec(convertStringToLittleEdian(runOffset));
-                this->runlist.push_back(run);
-                current += bytesToParseNum + bytesToParseCount;
+                int clusterRun = convertHexadecimalToDecimal(entry[current + 1]);
+                current += 2;
+                int clusterRunStr = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(entry, current, bytesToParseNum)));
+                for (int i = 0; i < clusterRun * bpb.getSc(); i++)
+                {
+                    readSector(charToLPCWSTR(diskPath), clusterRunStr * bpb.getSc() + i, 512, data);
+                }
+                string realData = convertHexToUTF16(getStringFromVector(data, 0, data.size()));
+                for (int i = 0; i < realData.size(); i++)
+                    this->fileName.push_back(realData[i]);
+                current += bytesToParseCount;
             }
-            int sectorPerCluster = bpb.getSc();
-            vector<vector<string>> clusterData;
-            for (int i = 0; i < this->runlist.size(); i++)
-            {
-                vector<string> temp;
-                readClusters(charToLPCWSTR(diskPath), runlist[i].clusterNumber, sectorPerCluster, runlist[i].clusterCount * sectorPerCluster * bpb.getSectorSize(), temp);
-                clusterData.push_back(temp);
-            }
-            this->fileName = "";
-            for (int i = 0; i < clusterData.size(); i++)
-                this->fileName += convertHexToUTF16(getStringFromVector(clusterData[i], 0, clusterData[i].size()));
         }
-        
     }
 
 vector<string> extractHeader(vector<string> entry)

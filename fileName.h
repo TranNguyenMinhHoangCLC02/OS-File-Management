@@ -11,7 +11,6 @@ class FileName
 {
 private:
     vector<string> entry;
-    vector<dataRun> runlist;
     NTFSAttributeHeader header;
     int sizeAttribute;
     int offset;
@@ -23,7 +22,6 @@ public:
     {
         this->header = NTFSAttributeHeader();
         this->entry = {};
-        this->runlist = {};
         this->sizeAttribute = 0;
         this->offset = 0;
         this->lengthFileName = 0;
