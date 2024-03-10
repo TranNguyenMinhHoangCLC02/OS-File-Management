@@ -7,6 +7,8 @@ class StandardInfo {
 private: 
     int flag;
     NTFSAttributeHeader header;
+    int offset;
+    vector<string> entry;
 public:
     StandardInfo(vector<string> entry);
     void printInfo();
