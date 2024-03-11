@@ -56,6 +56,7 @@ int main()
         bpb.printBPB();
         bpb.printBPBInfo();
         int MFTStart = bpb.startingClusterOfMFT();
+        cout << MFTStart << endl;
         int Sc = bpb.getSc();
         vector<vector<string>> entries;
         vector<string> MFT;
