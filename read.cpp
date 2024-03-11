@@ -23,24 +23,6 @@ LPCWSTR charToLPCWSTR(const char* input) {
     return wide_string;
 }
 
-
-// LPCWSTR charToLPCWSTR(const char* charString)
-// {
-//     int size = MultiByteToWideChar(CP_UTF8, 0, charString, -1, nullptr, 0);
-//     if (size == 0) {
-//         cerr << "Failed to get required buffer size. Error code: " << GetLastError() << std::endl;
-//         return nullptr;
-//     }
-
-//     vector<wchar_t> buffer(size);
-//     if (MultiByteToWideChar(CP_UTF8, 0, charString, -1, buffer.data(), size) == 0) {
-//         cerr << "Failed to convert string. Error code: " << GetLastError() << std::endl;
-//         return nullptr;
-//     }
-//     cerr << buffer.data() << endl;
-//     return buffer.data();
-// }
-
 string decimalToHex(int decimal) {
     std::stringstream stream;
     stream << std::hex << setw(2) << setfill('0') << uppercase << decimal;
@@ -137,13 +119,13 @@ void readSector(LPCWSTR diskPath, unsigned long long offsetSector, DWORD size, v
 
 void readSector(const char *diskPath, DWORD offset, BYTE sector[512])
 {
-    HANDLE hDevice = CreateFileA(diskPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+    HANDLE hDevice = CreateFileW(charToLPCWSTR(diskPath), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, NULL);
     if (hDevice == INVALID_HANDLE_VALUE) {
         std::cerr << "Failed to open disk. Error code: " << GetLastError() << endl;
         return;
     }
-    SetFilePointer(hDevice, offset, NULL, FILE_BEGIN);
+    SetFilePointerEx(hDevice, { offset, 0 }, NULL, FILE_BEGIN);
     DWORD bytesRead;
     if (!ReadFile(hDevice, sector, 512, &bytesRead, NULL))
         cerr << "Failed to read VBR. Error code: " << GetLastError() << endl;

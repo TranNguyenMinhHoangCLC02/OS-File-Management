@@ -115,13 +115,3 @@ void BPB::printBPB()
             cout << endl;
     }
 }
-
-// int main()
-// {
-//     const char *diskPath = "\\\\.\\C:";
-//     vector<string> storedValues;
-//     readBPB(diskPath, storedValues);
-//     printBPBInfo(storedValues);
-//     system("pause");
-//     return 0;
-// }

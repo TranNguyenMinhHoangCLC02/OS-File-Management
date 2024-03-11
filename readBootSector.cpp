@@ -49,22 +49,3 @@ void BootSector::printBootSector() {
     }
     cout << "Type of FAT: " << fatTypeString << endl;
 }
-
-// int main(int argc, char ** argv)
-// {
-//     BYTE sector[512];
-//     readSector("\\\\.\\F:", 0, sector);
-//     BootSector bootSector;
-//     bootSector.readBootSector(sector);
-//     bootSector.printBootSector();
-
-//     Entries entries;
-//     entries.readEntireEntries(bootSector.getstartClusterRDET() * bootSector.getSc());
-//     entries.readEntries();
-
-
-    
-//     system("pause");
-//     return 0;
-// }
-
