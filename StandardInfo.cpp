@@ -1,17 +1,25 @@
 #include "StandardInfo.h"
 
+// Constructor của lớp StandardInfo
 StandardInfo::StandardInfo(vector<string> entry)
 {
     this->entry = entry;
     this->header = NTFSAttributeHeader(entry);
+
+    // Xác định vị trí offset bắt đầu của nội dung thuộc tính
     this->offset = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->entry, 20, 21 - 20 + 1)));
+    
+    // Xác định giá trị của cờ
     this->flag = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(entry, this->offset + 32, 35 - 32 + 1)));
 }
 
+// Hàm in thông tin về thuộc tính Standard Information
 void StandardInfo::printInfo()
 {
     cout << "Standard Information Attribute" << endl;
     cout << "Flag: " << this->flag << endl;
+
+    // Sử dụng switch để mô tả giá trị của trường cờ
     switch (this->flag)
     {
         case 0x0001:
