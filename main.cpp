@@ -8,9 +8,9 @@
 #include "fatTable.h"
 #include <cmath>
 #include "BPB.h"
-#include "MFT.h"
 #include "DATA.h"
-#include "indexRoot.h"
+#include "fileName.h"
+#include "standardInfo.h"
 using namespace std;
 
 int main()
@@ -54,7 +54,7 @@ int main()
 
     else {
         BPB bpb(charToLPCWSTR(diskPath.c_str()));
-        bpb.printBPB();
+        cout << "BPB info: \n";
         bpb.printBPBInfo();
         int MFTStart = bpb.startingClusterOfMFT();
         int Sc = bpb.getSc();
