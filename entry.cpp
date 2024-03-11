@@ -121,10 +121,6 @@ void Entry::readEntry(vector<vector<string>> entry)
                 this->name += primaryEntry[i];
         this->name = convertHexToUTF16(this->name);
     }
-    string extension = getStringFromVector(primaryEntry, 0x8, 3);
-    extension = convertHexToUTF16(extension);
-    if (extension != "" && extension != "   ")
-        this->name += "." + extension;
     this->attribute = (EntryAttribute)convertHexadecimalToDecimal(primaryEntry[0xB]);
     string temp = convertStringToLittleEdian(getStringFromVector(primaryEntry, 0x1C, 4));
     this->size = convertHexadecimalToDecimal(temp);
@@ -277,7 +273,7 @@ Folder* Entries::getRootDirectory(BootSector bootSector, FatTable fatTable, cons
             for(int j = 0; j < list_Sector[i].size() ; j++){
                 int size = 0;
                 BYTE* data = new BYTE[bootSector.getSc() * 512];
-                readSector("\\\\.\\F:", list_Sector[i][j] * 512, data, bootSector.getSc() * 512);
+                readSector(diskPath, list_Sector[i][j] * 512, data, bootSector.getSc() * 512);
                 for(int t = 0; t < bootSector.getSc() * 512 && size < entries[i]->getSize(); t++){
                     binary_data.push_back(data[t]);
                     size ++;

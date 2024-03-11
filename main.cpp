@@ -35,6 +35,7 @@ int main()
         readSector(diskPath.c_str(), 0, sector);
         BootSector bootSector;
         bootSector.readBootSector(sector);
+        bootSector.printBootSector();
 
         FatTable fatTable(diskPath.c_str(), bootSector.getSf(), bootSector.getSb());
 
