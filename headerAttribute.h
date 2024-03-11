@@ -9,8 +9,8 @@ private:
     unsigned long long typeID;
     int attributeSize;
     int flagNonResident;
-    int lengthAttribute;
-    int positionOfAttribute;
+    int nameLength;
+    int positionOfAttributeName;
     int flag;
     int AttributeID;
 public:
@@ -19,8 +19,8 @@ public:
         this->typeID = 0;
         this->attributeSize = 0;
         this->flagNonResident = 0;
-        this->lengthAttribute = 0;
-        this->positionOfAttribute = 0;
+        this->nameLength = 0;
+        this->positionOfAttributeName = 0;
         this->flag = 0;
         this->AttributeID = 0;
     }
@@ -29,8 +29,8 @@ public:
     int getTypeID();
     int getAttributeSize();
     int getFlagNonResident();
-    int getLengthAttribute();
-    int getPositionOfAttribute();
+    int getNameLength();
+    int getPositionOfAttributeName();
     int getFlag();
     int getAttributeID();
 };
