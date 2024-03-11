@@ -14,13 +14,3 @@ void printMBR(vector<string> storedValues)
             cout << endl;
     }
 }
-
-// int main()
-// {
-//     const char *diskPath = "\\\\.\\PhysicalDrive0";
-//     vector<string> storedValues;
-//     readSector(diskPath, 0, 512, storedValues);
-//     printMBR(storedValues);
-//     system("pause");
-//     return 0;
-// }

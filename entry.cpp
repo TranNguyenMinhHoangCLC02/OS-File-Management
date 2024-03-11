@@ -55,24 +55,6 @@ string convertStringToLittleEdian(string input)
 string getNameFromSecondaryEntry(vector<string> entry)
 {
     string name = "";
-    // for (int i = 1; i < 0xA; i++)
-    // {
-    //     if (entry[i] == "FF")
-    //         break;
-    //     name += entry[i];
-    // }
-    // for (int i = 0xE; i < 0x1A; i++)
-    // {
-    //     if (entry[i] == "FF")
-    //         break;
-    //     name += entry[i];
-    // }
-    // for (int i = 0x1C; i < 0x1F; i++)
-    // {
-    //     if (entry[i] == "FF")
-    //         break;
-    //     name += entry[i];
-    // }
     name += getStringFromVector(entry, 1, 0xA);
     name += getStringFromVector(entry, 0xE, 0xC);
     name += getStringFromVector(entry, 0x1C, 0x4);
@@ -232,12 +214,6 @@ void Entries::print()
         cout << "\n";
         entries[i]->printEntry();
     }
-}
-
-Entries::~Entries()
-{
-    // for (int i = 0; i < entries.size(); i++)
-    //     delete entries[i];
 }
 
 void Entries::removeEntry(int index){

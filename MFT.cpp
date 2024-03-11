@@ -37,23 +37,17 @@ void processMFTEntry(vector<string> MFTentry, BPB &bpb, string diskPath) {
         int attributeSize = header.getAttributeSize();
         MFTentry.erase(MFTentry.begin(), MFTentry.begin() + attributeSize);
         }
-        // header.printInfo();
         else if (header.getTypeID() == 16) {
             StandardInfo standardInfo(MFTentry);
-            // standardInfo.printInfo();
             cout << "flags: " << standardInfo.getFlags() << endl;
             MFTentry.erase(MFTentry.begin(), MFTentry.begin() + standardInfo.getSize());
         }
-
         else if (header.getTypeID() == 48) {
             FileName fileName(MFTentry, bpb, diskPath.c_str());
-            // fileName.print();
             MFTentry.erase(MFTentry.begin(), MFTentry.begin() + fileName.getSizeEntireAttribute());
         }
-
         else if (header.getTypeID() == 128) {
             DATA data(diskPath.c_str(), MFTentry, bpb, 0);
-            // data.print();
             MFTentry.erase(MFTentry.begin(), MFTentry.begin() + data.getDataSize());
         }
     }

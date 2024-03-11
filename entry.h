@@ -96,7 +96,6 @@ public:
     void print();
     WORD getNRDET() { return entries.size(); }
     vector<Entry*> getEntries() {return entries;}
-    ~Entries();
     Folder* getRootDirectory(BootSector bootSector, FatTable fatTable, const char* diskPath);  
     Folder* getSubDirectory(BootSector bootSector, FatTable fatTable, const char* diskPath, string name);
 

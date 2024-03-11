@@ -23,24 +23,6 @@ LPCWSTR charToLPCWSTR(const char* input) {
     return wide_string;
 }
 
-
-// LPCWSTR charToLPCWSTR(const char* charString)
-// {
-//     int size = MultiByteToWideChar(CP_UTF8, 0, charString, -1, nullptr, 0);
-//     if (size == 0) {
-//         cerr << "Failed to get required buffer size. Error code: " << GetLastError() << std::endl;
-//         return nullptr;
-//     }
-
-//     vector<wchar_t> buffer(size);
-//     if (MultiByteToWideChar(CP_UTF8, 0, charString, -1, buffer.data(), size) == 0) {
-//         cerr << "Failed to convert string. Error code: " << GetLastError() << std::endl;
-//         return nullptr;
-//     }
-//     cerr << buffer.data() << endl;
-//     return buffer.data();
-// }
-
 string decimalToHex(int decimal) {
     std::stringstream stream;
     stream << std::hex << setw(2) << setfill('0') << uppercase << decimal;
