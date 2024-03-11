@@ -6,8 +6,8 @@ NTFSAttributeHeader::NTFSAttributeHeader(vector<string> header)
     this->typeID = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->header, 0, 3 - 0 + 1)));
     this->attributeSize = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->header, 4, 7 - 4 + 1)));
     this->flagNonResident = convertHexadecimalToDecimal(getStringFromVector(this->header, 8, 1));
-    this->lengthAttribute = convertHexadecimalToDecimal(getStringFromVector(this->header, 9, 1));
-    this->positionOfAttribute = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->header, 10, 11 - 10 + 1)));
+    this->nameLength = convertHexadecimalToDecimal(getStringFromVector(this->header, 9, 1));
+    this->positionOfAttributeName = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->header, 10, 11 - 10 + 1)));
     this->flag = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->header, 12, 13 - 12 + 1)));
     this->AttributeID = convertHexadecimalToDecimal(convertStringToLittleEdian(getStringFromVector(this->header, 14, 15 - 14 + 1)));
 }
@@ -17,8 +17,8 @@ void NTFSAttributeHeader::printInfo()
     cout << "Type ID: " << this->typeID << endl;
     cout << "Attribute Size: " << this->attributeSize << endl;
     cout << "Flag Non Resident: " << this->flagNonResident << endl;
-    cout << "Length Attribute Name: " << this->lengthAttribute << endl;
-    cout << "Position of Attribute Name: " << this->positionOfAttribute << endl;
+    cout << "Length Attribute Name: " << this->nameLength << endl;
+    cout << "Position of Attribute Name: " << this->positionOfAttributeName << endl;
     cout << "Flag: " << this->flag << endl;
     cout << "Attribute ID: " << this->AttributeID << endl;
     system("pause");
@@ -39,14 +39,14 @@ int NTFSAttributeHeader::getFlagNonResident()
     return this->flagNonResident;
 }
 
-int NTFSAttributeHeader::getLengthAttribute()
+int NTFSAttributeHeader::getNameLength()
 {
-    return this->lengthAttribute;
+    return this->nameLength;
 }
 
-int NTFSAttributeHeader::getPositionOfAttribute()
+int NTFSAttributeHeader::getPositionOfAttributeName()
 {
-    return this->positionOfAttribute;
+    return this->positionOfAttributeName;
 }
 
 int NTFSAttributeHeader::getFlag()
