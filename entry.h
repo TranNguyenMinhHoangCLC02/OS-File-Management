@@ -46,7 +46,6 @@ public:
     Entry& operator=(const Entry& entry);
     void readEntry(vector<vector<string>> entry);
     void printEntry();
-    void print();
     EntryAttribute getAttribute(){ return attribute;}
     int getFirstCluster(){ return firstCluster; };
     string getName() { return name; };
@@ -55,7 +54,7 @@ public:
     void setName(string name) { this->name = name; }
     friend string getFullNameFromASetOfEntry(vector<vector<string>> entry);
     friend string getNameFromSecondaryEntry(vector<string> entry);
-    File* getFile(BootSector bootSector, FatTable fatTable);
+    File* getFile(BootSector bootSector, FatTable fatTable, const char* diskPath, vector<DWORD> list_sector, int size);
 };
 
 class Item{
@@ -63,7 +62,6 @@ class Item{
 public:
     void setEntry(Entry* entry);
     void virtual print(int level = 0);
-    vector<Item*> virtual getSubfolder(){}
     void virtual deleteItem();
 };
 
@@ -72,7 +70,6 @@ class Folder : public Item{
 public:
     Folder();
     void addItem(Item* item);
-    vector<Item*> getSubfolder() { return subfolder; }
     void print(int level = 0);
     void deleteItem();
 };
@@ -88,16 +85,10 @@ class Entries
 {
 private:
     vector<Entry*> entries;
-    WORD NRDET; // Number entry of RDET
 public:
     void input(vector<vector<string>> entries);
     vector<int> getListClusters();
     vector<vector<DWORD>> getListSector(BootSector bootSector, FatTable fatTable);
-    void print();
-    WORD getNRDET() { return entries.size(); }
-    vector<Entry*> getEntries() {return entries;}
     Folder* getRootDirectory(BootSector bootSector, FatTable fatTable, const char* diskPath);  
     Folder* getSubDirectory(BootSector bootSector, FatTable fatTable, const char* diskPath, string name);
-
-    void removeEntry(int index); 
 };

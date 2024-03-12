@@ -93,19 +93,6 @@ Entry& Entry::operator=(const Entry& entry){
 }
 
 
-void Entry::print()
-{
-    for (int i = 0; i < entries.size(); i++)
-    {
-        for (int j = 0; j < entries[i].size(); j++)
-        {
-            if (j % 16 == 0)
-                cout << endl;
-            cout << entries[i][j] << " ";
-        }
-        cout << endl;
-    }
-}
 
 void Entry::readEntry(vector<vector<string>> entry)
 {
@@ -141,7 +128,6 @@ void readEntireEntries(const char* diskPath, DWORD startSectorOfRDET, vector<vec
             vector<string> entry;
             for (int j = 0; j < 32; j++) {
                 entry.push_back(storedValues[i + j]);
-                // cout << storedValues[i+j] << " ";
             }
             if (checkEmpty(entry))
                 break;
@@ -177,7 +163,6 @@ void Entry::printEntry()
     cout << "Size: " << size << " bytes" << endl;
     cout << "First cluster: " << firstCluster << endl;
     cout << endl;
-
 }
 
 void Entries::input(vector<vector<string>> entries)
@@ -202,29 +187,31 @@ vector<int> Entries::getListClusters(){
     return listClusters;
 }
 
-void Entries::print()
-{
-    for (int i = 0; i < entries.size(); i++)
-    {
-        entries[i]->print();
-        cout << "\n";
-        entries[i]->printEntry();
-    }
-}
-
-void Entries::removeEntry(int index){
-    delete []entries[index];
-    entries.erase(entries.begin() + index);
-}
-
 Folder* Entries::getSubDirectory(BootSector bootSector, FatTable fatTable, const char* diskPath, string name){
     entries.erase(entries.begin() + 1);
     entries[0]->setName(name);
     return getRootDirectory(bootSector, fatTable, diskPath);
 }
 
-File* Entry::getFile(BootSector bootSector, FatTable fatTable){
+File* Entry::getFile(BootSector bootSector, FatTable fatTable, const char* diskPath, vector<DWORD> list_Sector, int size){
     File* a = new File;
+    vector<BYTE> binary_data;
+    for(int i = 0; i < list_Sector.size() ; i++){
+        int current_size = 0;
+        BYTE* data = new BYTE[bootSector.getSc() * 512];
+        readSector(diskPath, list_Sector[i] * 512, data, bootSector.getSc() * 512);
+        for(int t = 0; t < bootSector.getSc() * 512 && current_size < size; t++){
+            binary_data.push_back(data[t]);
+            size ++;
+        }
+        delete[] data;
+    }
+    string content = "";
+    for(int i = 0; i < binary_data.size(); i++)
+    {
+        content += decimalToHex(binary_data[i]) ;
+    }
+    a->setData(convertHexToUTF16(content));
     return  a;
 }
 
@@ -268,27 +255,8 @@ Folder* Entries::getRootDirectory(BootSector bootSector, FatTable fatTable, cons
                 item = entry.getSubDirectory(bootSector, fatTable, diskPath, entries[i]->getName());
             }
         } else if(entries[i]->getAttribute() == Archive){
-            File* f = entries[i]->getFile(bootSector, fatTable);
-            vector<BYTE> binary_data;
-            for(int j = 0; j < list_Sector[i].size() ; j++){
-                int size = 0;
-                BYTE* data = new BYTE[bootSector.getSc() * 512];
-                readSector(diskPath, list_Sector[i][j] * 512, data, bootSector.getSc() * 512);
-                for(int t = 0; t < bootSector.getSc() * 512 && size < entries[i]->getSize(); t++){
-                    binary_data.push_back(data[t]);
-                    size ++;
-                }
-                delete[] data;
-            }
-            string content = "";
-            for(int i = 0; i < binary_data.size(); i++)
-            {
-                content += decimalToHex(binary_data[i]) ;
-            }
-            f->setData(convertHexToUTF16(content));
-            item = f;
-            item->setEntry(entries[i]);
-            
+            File* f = entries[i]->getFile(bootSector, fatTable, diskPath, list_Sector[i], entries[i]->getSize());
+            f->setEntry(entries[i]);           
         }
         res->addItem(item);
     }
@@ -318,7 +286,7 @@ void File::print(int level){
     if(data != "")
         cout <<data;
     else
-        cout << "Khong co gi het nha:))";
+        cout << "empty file";
     cout << endl << endl;
 }
 
